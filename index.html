@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clase 5: Listas en Python | Guía pedagógica</title>
+<style>
+:root{
+  --bg1:#f8fafc;--bg2:#e2e8f0;--card:#ffffff;--ink:#1e293b;--muted:#64748b;--line:#e2e8f0;
+  --blue:#3b82f6;--green:#10b981;--orange:#f59e0b;--purple:#8b5cf6;--red:#ef4444;
+  --t-blue:#eff6ff;--t-green:#ecfdf5;--t-orange:#fffbeb;--t-purple:#f5f3ff;--t-red:#fef2f2;
+  --code:#1e293b;--code-ink:#e2e8f0;--shadow:0 1px 3px rgba(15,23,42,.08),0 4px 14px rgba(15,23,42,.05);
+  --docente:#f0f9ff;--docente-b:#0ea5e9;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg1:#0f172a;--bg2:#111c33;--card:#172036;--ink:#e2e8f0;--muted:#94a3b8;--line:#26324a;
+  --t-blue:#172a4a;--t-green:#0f2f2a;--t-orange:#33280f;--t-purple:#261f45;--t-red:#3a1a1f;
+  --code:#0b1222;--code-ink:#e2e8f0;--shadow:0 1px 3px rgba(0,0,0,.4);--docente:#0c2534;
+}}
+:root[data-theme="dark"]{
+  --bg1:#0f172a;--bg2:#111c33;--card:#172036;--ink:#e2e8f0;--muted:#94a3b8;--line:#26324a;
+  --t-blue:#172a4a;--t-green:#0f2f2a;--t-orange:#33280f;--t-purple:#261f45;--t-red:#3a1a1f;
+  --code:#0b1222;--code-ink:#e2e8f0;--shadow:0 1px 3px rgba(0,0,0,.4);--docente:#0c2534;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 16px);scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;color:var(--ink);
+  background:linear-gradient(135deg,var(--bg1),var(--bg2)) fixed;background-color:var(--bg1);line-height:1.55;font-size:16px}
+code,pre,textarea{font-family:"Cascadia Code","JetBrains Mono",Consolas,"Fira Code",ui-monospace,monospace}
+p code,li code,td code,h3 code,.tile code,.alerta code,button code,small code{background:rgba(59,130,246,.12);color:inherit;padding:.05em .35em;border-radius:5px;font-size:.88em}
+a{color:var(--blue)}
+.c-blue{color:var(--blue)}.c-green{color:var(--green)}.c-orange{color:var(--orange)}.c-purple{color:var(--purple)}.c-red{color:var(--red)}
+.muted{color:var(--muted);font-size:.92rem}
+
+/* layout */
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;max-width:1440px;margin:0 auto;padding:24px 24px 0}
+aside.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;max-height:calc(100vh - 32px);overflow:auto}
+main{min-width:0}
+@media (max-width:980px){.layout{grid-template-columns:minmax(0,1fr);padding:14px 14px 0}aside.side{position:static;max-height:none}}
+
+/* side */
+.side-box{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:16px;margin-bottom:14px;border:1px solid var(--line)}
+.side-box h4{margin:0 0 10px;font-size:.95rem;display:flex;gap:8px;align-items:center}
+.reloj{font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.reloj small{font-size:.9rem;color:var(--muted);font-weight:500}
+.barra{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin:8px 0 12px}
+.barra>span{display:block;height:100%;width:0;background:var(--blue);transition:width .4s}
+.btns{display:flex;gap:6px;flex-wrap:wrap}
+.agenda{list-style:none;margin:0;padding:0}
+.agenda a{display:flex;justify-content:space-between;gap:8px;padding:7px 10px;border-radius:9px;text-decoration:none;color:var(--ink);font-size:.92rem;border-left:3px solid transparent}
+.agenda a:hover{background:var(--t-blue)}
+.agenda a span:last-child{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.85rem;white-space:nowrap}
+.agenda a.activo{background:var(--t-blue);border-left-color:var(--blue);font-weight:600}
+.agenda a.hecho{color:var(--muted)}
+.modo{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
+.switch{position:relative;width:44px;height:24px;flex:none}
+.switch input{opacity:0;width:0;height:0}
+.switch span{position:absolute;inset:0;background:var(--line);border-radius:20px;cursor:pointer;transition:.2s}
+.switch span::before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.switch input:checked+span{background:var(--blue)}
+.switch input:checked+span::before{transform:translateX(20px)}
+.switch input:focus-visible+span{outline:2px solid var(--blue);outline-offset:2px}
+.py-estado{font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:6px;margin-top:10px}
+.py-estado .dot{width:8px;height:8px;border-radius:50%;background:var(--orange)}
+.py-estado.listo .dot{background:var(--green)}
+
+/* buttons */
+button{font:inherit;cursor:pointer}
+.btn,.btn-run,.btn-sec{border:0;border-radius:8px;padding:6px 12px;font-size:.88rem;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.btn{background:var(--t-blue);color:var(--blue)}
+.btn-run{background:var(--green);color:#fff}
+.btn-run:disabled{opacity:.6;cursor:wait}
+.btn-sec{background:transparent;color:var(--muted);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* hero */
+.hero{text-align:center;padding:34px 10px 26px;position:relative}
+.hero h1{font-size:clamp(2.2rem,5vw,3.6rem);margin:0;line-height:1.1;display:inline-flex;gap:16px;align-items:center;letter-spacing:-.01em}
+.hero h1 i{color:var(--blue)}
+.hero p{color:var(--muted);font-size:1.25rem;margin:10px 0 0}
+.hero .pill{margin-top:14px}
+
+/* sections */
+.seccion{margin:0 0 46px}
+.sec-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.sec-tit{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec-tit>i{color:var(--blue);font-size:1.5rem;align-self:center}
+.sec-tit h2{margin:0;font-size:1.6rem;line-height:1.2}
+.sec-sub{color:var(--muted);font-size:.98rem}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:var(--t-blue);color:var(--blue);border-radius:20px;padding:4px 12px;font-size:.85rem;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.subtema{display:flex;align-items:center;gap:10px;margin:26px 0 12px;font-size:1.15rem}
+.subnum{background:var(--blue);color:#fff;border-radius:8px;padding:1px 9px;font-size:.9rem}
+.submin{margin-left:auto;color:var(--muted);font-size:.85rem;font-weight:500}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.col>*+*{margin-top:14px}
+@media (max-width:1180px){.row2{grid-template-columns:minmax(0,1fr)}}
+
+.card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px;border:1px solid var(--line)}
+.card-tit{margin:0 0 10px;font-size:1.05rem;display:flex;gap:9px;align-items:center}
+.card p{margin:.4em 0 .7em}
+.tiles{display:grid;gap:10px;margin:10px 0}
+.tiles.t2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tiles.t3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:600px){.tiles.t2,.tiles.t3{grid-template-columns:1fr}}
+.tile{border-radius:9px;padding:10px 12px;border-left:4px solid}
+.tile p{margin:2px 0 0;font-size:.9rem;color:var(--muted)}
+.tile-tit{font-weight:700;font-size:.95rem;display:flex;gap:7px;align-items:center}
+.t-blue{background:var(--t-blue);border-color:var(--blue)}.t-blue .tile-tit i{color:var(--blue)}
+.t-green{background:var(--t-green);border-color:var(--green)}.t-green .tile-tit i{color:var(--green)}
+.t-orange{background:var(--t-orange);border-color:var(--orange)}.t-orange .tile-tit i{color:var(--orange)}
+.t-purple{background:var(--t-purple);border-color:var(--purple)}.t-purple .tile-tit i{color:var(--purple)}
+.t-red{background:var(--t-red);border-color:var(--red)}.t-red .tile-tit i{color:var(--red)}
+
+/* code window */
+.win{background:var(--code);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.win-bar{display:flex;align-items:center;gap:7px;padding:10px 14px;color:#94a3b8;font-size:.82rem;border-bottom:1px solid rgba(148,163,184,.12)}
+.win-bar .d{width:11px;height:11px;border-radius:50%}
+.win-bar .d:nth-child(1){background:#ef4444}.win-bar .d:nth-child(2){background:#f59e0b}.win-bar .d:nth-child(3){background:#10b981}
+.win-bar .titulo{margin-left:8px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.win-bar button{background:rgba(148,163,184,.14);color:#cbd5e1;border:0;border-radius:6px;padding:3px 9px;font-size:.78rem;font-weight:600}
+.win-bar button.run{background:#10b981;color:#fff}
+.win pre.py,.win textarea{margin:0;padding:14px 16px;color:var(--code-ink);font-size:.86rem;line-height:1.6;overflow-x:auto;white-space:pre;tab-size:4}
+.win textarea,.editor{width:100%;min-height:160px;border:0;resize:vertical;background:#0f172a;color:#e2e8f0;display:block;font-size:.86rem;line-height:1.6;padding:14px 16px;white-space:pre;overflow:auto}
+.consola{margin:0;padding:12px 16px;background:#020617;color:#cbd5e1;font-size:.84rem;white-space:pre-wrap;border-top:1px solid #1e293b;max-height:340px;overflow:auto}
+.consola .err{color:#fca5a5}
+.consola .ayuda{display:block;margin-top:8px;padding:8px 10px;border-radius:7px;background:rgba(245,158,11,.14);color:#fde68a;font-family:"Segoe UI",system-ui,sans-serif;white-space:normal}
+.consola .meta{color:#64748b}
+.tok-c{color:#64748b;font-style:italic}.tok-s{color:#34d399}.tok-n{color:#60a5fa}.tok-k{color:#c084fc}.tok-b{color:#38bdf8}.tok-m{color:#93c5fd}.tok-v{color:#fbbf24}
+
+/* alert + teacher */
+.alerta{border-radius:12px;border:1px solid rgba(239,68,68,.35);border-left:5px solid var(--red);background:var(--t-red);padding:12px 16px}
+.alerta-tit{font-weight:700;color:var(--red);display:flex;gap:8px;align-items:center;margin-bottom:4px}
+.alerta p{margin:.35em 0}.alerta ul{margin:.3em 0;padding-left:1.2em}
+.alerta .win{margin-top:10px}
+.docente{border-radius:12px;border:1px dashed var(--docente-b);background:var(--docente);padding:12px 16px}
+.docente-tit{font-weight:700;color:var(--docente-b);display:flex;gap:8px;align-items:center;margin-bottom:4px}
+.docente p{margin:.35em 0}
+body.alumno .docente{display:none}
+
+/* tables */
+.tabla-wrap{overflow-x:auto}
+.tabla{width:100%;border-collapse:collapse;font-size:.9rem}
+.tabla th{text-align:left;color:var(--muted);font-weight:600;border-bottom:2px solid var(--line);padding:7px 8px}
+.tabla td{border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:top}
+.tabla .none{color:var(--red);font-weight:600}.tabla .val{color:var(--green);font-weight:600}
+span.none{color:var(--red);font-weight:600}
+.traza{font-variant-numeric:tabular-nums;margin:10px 0}
+.traza td,.traza th{text-align:center}
+
+/* comparar */
+.comparar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.comparar>div{border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:5px}
+.comparar span{font-weight:700;font-size:.88rem}
+.comparar code{background:transparent!important;padding:0!important;font-size:.88rem}
+.comparar small{color:var(--muted)}
+.mal{background:var(--t-red)}.mal span{color:var(--red)}
+.bien{background:var(--t-green)}.bien span{color:var(--green)}
+.lista-ok{padding-left:1.2em;margin:.5em 0}.lista-ok li{margin:.25em 0}
+
+/* index guide */
+.idx-guia{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:8px 0 12px}
+.idx{display:flex;flex-direction:column;align-items:center;gap:2px}
+.idx .v{border-radius:8px;padding:8px 14px;font-weight:700;border-left:0;color:#fff}
+.idx .t-blue{background:var(--blue)}.idx .t-green{background:var(--green)}.idx .t-orange{background:var(--orange)}.idx .t-purple{background:var(--purple)}
+.idx small{color:var(--muted);font-size:.8rem;font-variant-numeric:tabular-nums}
+.idx small.neg{color:var(--red)}
+
+/* chips */
+.chip-btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:4px 11px;font-size:.84rem}
+.chip-btn.on{background:var(--t-blue);border-color:var(--blue);color:var(--blue);font-weight:600}
+.chip-btn.accion{border-color:var(--green);color:var(--green)}
+.chip-btn code{background:transparent!important;padding:0!important}
+
+/* alias sim */
+.alias{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px}
+.alias-ctrl{display:flex;gap:6px;flex-wrap:wrap}
+.alias-mem{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0 6px;min-height:90px;align-items:flex-end}
+.obj{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.etqs{display:flex;gap:6px}
+.etq{background:var(--orange);color:#fff;font-weight:700;border-radius:6px;padding:1px 10px;font-family:"Cascadia Code",Consolas,monospace;position:relative}
+.etq::after{content:"↓";position:absolute;left:50%;transform:translateX(-50%);bottom:-19px;color:var(--muted);font-weight:400}
+.caja{display:flex;border:2px solid var(--blue);border-radius:9px;overflow:hidden;margin-top:12px}
+.caja span{padding:6px 12px;border-right:1px solid var(--line);font-family:"Cascadia Code",Consolas,monospace;background:var(--card)}
+.caja span:last-child{border-right:0}
+.caja span.nuevo{background:var(--t-green);color:var(--green);font-weight:700}
+.obj small{color:var(--muted);font-size:.78rem;font-family:"Cascadia Code",Consolas,monospace}
+.alias-msg{font-size:.92rem;margin:4px 0 0;min-height:2.6em}
+
+/* slicer */
+.slicer{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:6px}
+.slicer-in{display:flex;align-items:center;gap:3px;font-size:1.05rem;flex-wrap:wrap}
+.slicer-in code{background:transparent!important;font-weight:700}
+.slicer-in input{width:64px;padding:5px 6px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink);font:inherit;font-size:.95rem;text-align:center}
+.slicer-pres{display:flex;gap:5px;flex-wrap:wrap;margin:10px 0}
+.slicer-celdas{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:12px 0 6px}
+.celda{width:54px;border:2px solid var(--line);border-radius:9px;text-align:center;padding:4px 0;position:relative;transition:.2s}
+.celda b{display:block;font-size:1rem}
+.celda small{display:block;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.celda.sel{border-color:var(--green);background:var(--t-green)}
+.celda .ord{position:absolute;top:-10px;right:-8px;background:var(--green);color:#fff;font-size:.7rem;border-radius:9px;padding:0 6px;font-weight:700}
+.slicer-res{text-align:center;font-family:"Cascadia Code",Consolas,monospace;font-size:.95rem}
+.slicer-res .err{color:var(--red)}
+
+/* ejercicios */
+.nivel-tit{display:flex;gap:10px;align-items:center;font-size:1.15rem;margin:30px 0 12px}
+.niveles{display:flex;gap:7px;flex-wrap:wrap}
+.ej-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}
+.ej-grid.dios{grid-template-columns:1fr}
+.ej{background:var(--card);border-radius:14px;box-shadow:var(--shadow);border:1px solid var(--line);border-top:4px solid;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.n-basico{border-top-color:var(--green)}.n-intermedio{border-top-color:var(--orange)}.n-avanzado{border-top-color:var(--red)}.n-dios{border-top-color:var(--purple)}
+.ej-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ej-head h4{margin:0;font-size:1.02rem;flex:1;min-width:180px}
+.ej-id{font-weight:800;color:var(--muted);font-size:.85rem}
+.ej-enun p{margin:0}
+.badge{border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:700;display:inline-flex;gap:5px;align-items:center}
+.b-basico{background:var(--t-green);color:var(--green)}.b-intermedio{background:var(--t-orange);color:#d97706}.b-avanzado{background:var(--t-red);color:var(--red)}.b-dios{background:var(--t-purple);color:var(--purple)}
+.salida-esp{background:var(--t-blue);border-radius:9px;padding:8px 12px}
+.salida-esp span{font-size:.8rem;font-weight:700;color:var(--blue)}
+.salida-esp pre{margin:4px 0 0;font-size:.82rem;white-space:pre-wrap}
+.practica{border-radius:10px;overflow:hidden;background:var(--code)}
+.practica-bar{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;color:#94a3b8;font-size:.82rem;gap:8px;flex-wrap:wrap}
+.practica-btns{display:flex;gap:6px}
+.practica .btn-sec{color:#cbd5e1;border-color:#334155;padding:3px 9px;font-size:.8rem}
+.practica .btn-run{padding:3px 10px;font-size:.8rem}
+details{border:1px solid var(--line);border-radius:10px;padding:0 12px}
+details summary{cursor:pointer;padding:9px 0;font-weight:600;font-size:.92rem;display:flex;gap:7px;align-items:center;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";margin-left:auto;color:var(--muted);font-size:1.1rem}
+details[open] summary::after{content:"−"}
+details>div{padding:0 0 12px}
+details.pista summary{color:#d97706}
+details.solucion summary{color:var(--green)}
+details h5{margin:12px 0 4px;font-size:.95rem}
+.pasos{padding-left:1.3em;margin:.4em 0 .8em}.pasos li{margin:.3em 0}
+details .win{margin-top:8px}
+
+/* pausa */
+.pausa-in{display:flex;gap:18px;align-items:center;background:var(--card);border-radius:14px;padding:20px 24px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.pausa-in i{font-size:2rem;color:var(--orange)}
+.pausa-in h2{margin:0;font-size:1.3rem}.pausa-in p{margin:2px 0 0;color:var(--muted)}
+
+/* quiz */
+.q{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.q:last-child{border-bottom:0}
+.q-num{flex:none;width:28px;height:28px;border-radius:50%;background:var(--t-blue);color:var(--blue);font-weight:700;display:grid;place-items:center;font-size:.85rem}
+.q-body{flex:1;min-width:0}
+pre.q-code{background:var(--code);color:var(--code-ink);border-radius:9px;padding:10px 12px;margin:0 0 8px;font-size:.84rem;overflow-x:auto}
+.q-ops{display:flex;flex-wrap:wrap;gap:6px}
+.q-op{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:4px 12px;font-family:"Cascadia Code",Consolas,monospace;font-size:.85rem}
+.q-op.ok{background:var(--t-green);border-color:var(--green);color:var(--green);font-weight:700}
+.q-op.no{background:var(--t-red);border-color:var(--red);color:var(--red)}
+.q-fb{margin:6px 0 0;font-size:.88rem;min-height:1em}
+.q-score{font-weight:700;color:var(--blue);margin:10px 0 0}
+
+/* footer */
+.pie{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.88rem;border-top:1px solid var(--line);padding:16px 0 26px;margin-top:10px}
+.pie .firma{font-weight:600;color:var(--ink)}
+@media print{aside.side,.practica,.win-bar button{display:none}.layout{grid-template-columns:1fr}details{border:0}details>div{display:block}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.13.2/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.13.2/brython_stdlib.js"></script>
+</head>
+<body>
+<div class="layout">
+<aside class="side" aria-label="Agenda y herramientas de la clase">
+  <div class="side-box">
+    <h4><i class="fa-regular fa-clock c-blue"></i> Reloj de la clase</h4>
+    <div class="reloj" id="reloj" aria-live="off">00:00</div>
+    <div class="barra"><span id="barra"></span></div>
+    <div class="btns"><button class="btn" id="t-play" type="button"><i class="fa-solid fa-play"></i> Iniciar</button><button class="btn-sec" id="t-reset" type="button">Reiniciar</button></div>
+  </div>
+  <div class="side-box">
+    <h4><i class="fa-solid fa-list-ol c-blue"></i> Agenda (120 min)</h4>
+    <ul class="agenda" id="agenda"></ul>
+  </div>
+  <div class="side-box">
+    <label class="modo"><span id="modo-lbl">Vista docente</span><span class="switch"><input type="checkbox" id="modo-docente" checked><span></span></span></label>
+    <p class="muted" style="margin:.5em 0 0">Apagalo para proyectar sin las notas para el docente.</p>
+    <div class="py-estado" id="py-estado"><span class="dot"></span><span>Cargando Python…</span></div>
+  </div>
+</aside>
+<main>
+<header class="hero">
+  <h1><i class="fa-solid fa-list-ul"></i> Listas en Python</h1>
+  <p>Métodos, depuración y ejercicios: clase teórico-práctica</p>
+  <span class="pill"><i class="fa-solid fa-graduation-cap"></i> Clase 5 · Programación en Python</span>
+</header>
+<section id="apertura" class="seccion">
+<header class="sec-head">
+  <div class="sec-tit"><i class="fa-solid fa-door-open"></i><h2>Apertura</h2><span class="sec-sub">| Encuadre y objetivos de la clase</span></div>
+  <div class="pills"><span class="pill"><i class="fa-regular fa-clock"></i> 5 min</span><span class="pill"><i class="fa-solid fa-flag"></i> Encuadre</span></div>
+</header>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-bullseye c-blue"></i> Objetivos de aprendizaje</h3><p>Al finalizar la clase, cada estudiante va a poder:</p>
+<div class="tiles t2">
+<div class="tile t-blue"><div class="tile-tit"><i class="fa-solid fa-circle-check"></i> Entender</div><p>Qué es una <b>lista</b>, por qué es <b>mutable</b> y qué pasa cuando dos variables apuntan a la misma.</p></div>
+<div class="tile t-green"><div class="tile-tit"><i class="fa-solid fa-pen-to-square"></i> Manipular</div><p>Acceder, cortar y modificar listas con <b>índices</b>, <b>slicing</b> y <b>métodos</b>.</p></div>
+<div class="tile t-orange"><div class="tile-tit"><i class="fa-solid fa-bug"></i> Depurar</div><p>Encontrar errores con <b>print()</b> estratégicos y prevenirlos con el <b>patrón guardián</b>.</p></div>
+<div class="tile t-purple"><div class="tile-tit"><i class="fa-solid fa-puzzle-piece"></i> Resolver</div><p>Aplicar listas en problemas de <b>filtrado</b>, <b>estadística</b> y <b>análisis de datos</b>.</p></div>
+</div></div><div class="card"><h3 class="card-tit"><i class="fa-solid fa-list-check c-blue"></i> Agenda de la clase (120 min)</h3><table class="tabla agenda-tabla"><thead><tr><th>Bloque</th><th>Contenido</th><th>Tiempo</th></tr></thead><tbody>
+<tr><td>Apertura</td><td>Encuadre y pregunta disparadora</td><td>5'</td></tr>
+<tr><td>Módulo 1</td><td>Fundamentos, mutabilidad, índices y slicing</td><td>25'</td></tr>
+<tr><td>Módulo 2</td><td>Métodos principales y trampas comunes</td><td>30'</td></tr>
+<tr><td>Pausa</td><td>Recreo</td><td>10'</td></tr>
+<tr><td>Módulo 3</td><td>Depuración y patrón guardián</td><td>15'</td></tr>
+<tr><td>Módulo 4</td><td>Práctica progresiva (4 niveles)</td><td>30'</td></tr>
+<tr><td>Cierre</td><td>Repaso relámpago y tarea</td><td>5'</td></tr>
+</tbody></table></div><aside class="docente"><div class="docente-tit"><i class="fa-solid fa-chalkboard-user"></i> Nota para el docente</div><p><b>Pregunta disparadora:</b> “Si tuvieran que guardar las notas de los 40 alumnos del curso, ¿crearían 40 variables?”. Dejá que respondan 1 minuto y escribí en el pizarrón <code>nota1, nota2, nota3…</code> para mostrar que no escala.</p>
+<p><b>Requisito previo:</b> variables, tipos de datos, <code>if</code> y <code>for</code>. Todos los bloques de código de esta página se pueden <b>ejecutar en vivo</b> con el botón ▶; usalo para que predigan la salida <i>antes</i> de ejecutar.</p></aside></div><div class="col"><div class="win"><pre class="py" data-title="python — primer contacto" data-run="1"># Antes: una variable por dato (no escala)
+nota1 = 7
+nota2 = 9
+nota3 = 4
+
+# Con listas: un solo nombre para toda la colección
+notas = [7, 9, 4]
+nombres = ["Ana", "Luis", "Sofía"]
+mixta = [10, "Hola", True, 3.14]
+
+print(notas)
+print("Cantidad de notas:", len(notas))</pre></div></div></div>
+</section>
+<section id="m1" class="seccion">
+<header class="sec-head">
+  <div class="sec-tit"><i class="fa-solid fa-cubes"></i><h2>Módulo 1: Fundamentos y mutabilidad</h2><span class="sec-sub">| Qué es una lista, referencias e índices</span></div>
+  <div class="pills"><span class="pill"><i class="fa-regular fa-clock"></i> 25 min</span><span class="pill"><i class="fa-solid fa-book-open"></i> Teoría</span></div>
+</header>
+
+<h3 class="subtema"><span class="subnum">1.1</span>¿Qué es una lista?<span class="submin">5 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-circle-info c-blue"></i> Definición</h3><p>Una <b>lista</b> es una colección <b>ordenada</b> y <b>mutable</b> de elementos. Se escribe entre corchetes <code>[ ]</code> con los elementos separados por coma, y puede guardar datos de distintos tipos, incluso repetidos.</p>
+<div class="tiles t2"><div class="tile t-blue"><div class="tile-tit"><i class="fa-solid fa-arrow-down-1-9"></i> Ordenada</div><p>Cada elemento tiene una posición fija (índice). <code>[1, 2] != [2, 1]</code>.</p></div><div class="tile t-green"><div class="tile-tit"><i class="fa-solid fa-pen"></i> Mutable</div><p>Se puede cambiar su contenido sin crear una lista nueva.</p></div><div class="tile t-orange"><div class="tile-tit"><i class="fa-solid fa-shapes"></i> Heterogénea</div><p>Admite <code>int</code>, <code>str</code>, <code>bool</code>, otras listas… en la misma colección.</p></div><div class="tile t-purple"><div class="tile-tit"><i class="fa-solid fa-clone"></i> Repetible</div><p>Un mismo valor puede aparecer varias veces.</p></div></div></div><aside class="docente"><div class="docente-tit"><i class="fa-solid fa-chalkboard-user"></i> Nota para el docente</div><p>Remarcá la palabra <b>mutable</b>: es la idea que sostiene todo el módulo. Preguntá: “¿Un <code>str</code> es mutable?” y probá <code>texto[0] = 'X'</code> en vivo para contrastar.</p></aside></div><div class="col"><div class="win"><pre class="py" data-title="python — características" data-run="1"># Una lista se define con corchetes y elementos separados por coma
+notas = [7, 9, 4, 9]          # Repetible: el 9 aparece dos veces
+alumno = ["Ana", 20, True]    # Heterogénea: str, int y bool juntos
+vacia = []                    # Lista vacía: ideal para acumular datos
+
+print(notas)          # [7, 9, 4, 9]
+print(len(notas))     # 4 -&gt; cantidad de elementos
+print(type(alumno))   # &lt;class 'list'&gt;
+
+# Ordenada: el orden importa
+print([1, 2] == [2, 1])   # False
+
+# Mutable: cambiamos un elemento "en el lugar"
+notas[2] = 6
+print(notas)          # [7, 9, 6, 9]
+
+# En cambio, un str NO es mutable
+texto = "Hola"
+texto[0] = "B"        # TypeError</pre></div></div></div>
+
+<h3 class="subtema"><span class="subnum">1.2</span>Mutabilidad y referencias (aliasing)<span class="submin">10 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-link c-blue"></i> Una variable es una etiqueta, no una caja</h3><p>Cuando escribís <code>b = a</code>, Python <b>no copia</b> la lista: pega una segunda etiqueta sobre el <b>mismo objeto</b> en memoria. A esto se lo llama <b>aliasing</b>. Cualquier cambio hecho a través de <code>b</code> se ve también desde <code>a</code>.</p>
+<p>Para trabajar de forma independiente hay que crear una <b>copia</b>: <code>a[:]</code>, <code>a.copy()</code> o <code>list(a)</code>.</p>
+<p class="muted">Probá el simulador: elegí cómo se crea <code>b</code> y después modificala.</p>
+<div class="alias" id="alias">
+  <div class="alias-ctrl">
+    <button class="chip-btn on" data-modo="alias"><code>b = a</code></button>
+    <button class="chip-btn" data-modo="copia"><code>b = a.copy()</code></button>
+    <button class="chip-btn accion" data-acc="append"><code>b.append(99)</code></button>
+    <button class="chip-btn" data-acc="reset">Reiniciar</button>
+  </div>
+  <div class="alias-mem" aria-live="polite"></div>
+  <p class="alias-msg"></p>
+</div></div><aside class="alerta"><div class="alerta-tit"><i class="fa-solid fa-triangle-exclamation"></i> Alerta de error típico: copia superficial con listas anidadas</div><p><code>.copy()</code> y <code>[:]</code> hacen una <b>copia superficial</b>: copian la lista exterior, pero las sublistas siguen compartidas. Para listas de listas usá <code>copy.deepcopy()</code>.</p><div class="win"><pre class="py" data-title="python — anidadas" data-run="1">import copy
+
+matriz = [[1, 2], [3, 4]]
+superficial = matriz.copy()
+superficial[0][0] = 99
+print(matriz)        # [[99, 2], [3, 4]]  &lt;- ¡la original cambió!
+
+matriz = [[1, 2], [3, 4]]
+profunda = copy.deepcopy(matriz)
+profunda[0][0] = 99
+print(matriz)        # [[1, 2], [3, 4]]   &lt;- intacta</pre></div></aside></div><div class="col"><div class="win"><pre class="py" data-title="python — aliasing y copias" data-run="1">a = [1, 2, 3]
+b = a              # NO copia: b es otro nombre para la MISMA lista
+b.append(4)
+print(a)           # [1, 2, 3, 4]  &lt;- ¡a también cambió!
+print(a is b)      # True: es el mismo objeto
+print(id(a) == id(b))   # True: misma dirección en memoria
+
+# Copias seguras: cada una crea una lista NUEVA
+c = a[:]           # copia por slicing
+d = a.copy()       # copia con método
+e = list(a)        # copia con el constructor
+c.append(99)
+print(a)           # [1, 2, 3, 4]       &lt;- a no se entera
+print(c)           # [1, 2, 3, 4, 99]
+print(a is d, a == d)   # False True -&gt; distinto objeto, mismo contenido</pre></div><div class="win"><pre class="py" data-title="python — aliasing en funciones" data-run="1"># El aliasing también ocurre al pasar listas a funciones
+def agregar_bonus(notas):
+    notas.append(10)          # modifica la lista ORIGINAL
+    return notas
+
+mis_notas = [7, 8]
+agregar_bonus(mis_notas)
+print(mis_notas)              # [7, 8, 10] &lt;- efecto colateral
+
+# Versión segura: trabajar sobre una copia
+def agregar_bonus_seguro(notas):
+    copia = notas.copy()
+    copia.append(10)
+    return copia
+
+originales = [7, 8]
+nuevas = agregar_bonus_seguro(originales)
+print(originales, nuevas)     # [7, 8] [7, 8, 10]</pre></div><aside class="docente"><div class="docente-tit"><i class="fa-solid fa-chalkboard-user"></i> Nota para el docente</div><p>Dibujá en el pizarrón las “etiquetas” <code>a</code> y <code>b</code> apuntando a una sola caja. Después pedí que predigan qué imprime <code>print(a)</code> antes de ejecutar. Es el error conceptual que más tarde aparece en los parciales.</p></aside></div></div>
+
+<h3 class="subtema"><span class="subnum">1.3</span>Índices, slicing y prevención de IndexError<span class="submin">10 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-eye c-blue"></i> Guía visual de índices</h3><div class="idx-guia">
+<div class="idx"><span class="v t-blue">Ana</span><small>0</small><small class="neg">-4</small></div>
+<div class="idx"><span class="v t-green">Luis</span><small>1</small><small class="neg">-3</small></div>
+<div class="idx"><span class="v t-orange">Sofía</span><small>2</small><small class="neg">-2</small></div>
+<div class="idx"><span class="v t-purple">Carlos</span><small>3</small><small class="neg">-1</small></div>
+</div>
+<p>Los <b>índices positivos</b> cuentan desde el inicio empezando en <code>0</code>. Los <b>negativos</b> cuentan desde el final: <code>-1</code> es siempre el último. El último índice positivo válido es <code>len(lista) - 1</code>.</p></div><div class="card"><h3 class="card-tit"><i class="fa-solid fa-scissors c-blue"></i> Slicing: <code>lista[inicio:fin:paso]</code></h3><div class="tiles t3"><div class="tile t-blue"><div class="tile-tit"><i class="fa-solid fa-play"></i> inicio</div><p>Desde dónde (incluido). Si se omite: el principio.</p></div><div class="tile t-green"><div class="tile-tit"><i class="fa-solid fa-stop"></i> fin</div><p>Hasta dónde (<b>no incluido</b>). Si se omite: el final.</p></div><div class="tile t-orange"><div class="tile-tit"><i class="fa-solid fa-shoe-prints"></i> paso</div><p>De a cuánto avanzar. Negativo: recorre al revés.</p></div></div>
+<div class="slicer" id="slicer">
+  <div class="slicer-in">
+    <code>numeros[</code><input aria-label="inicio" id="s-ini" placeholder="inicio" inputmode="numeric"><code>:</code><input aria-label="fin" id="s-fin" placeholder="fin" inputmode="numeric"><code>:</code><input aria-label="paso" id="s-paso" placeholder="paso" inputmode="numeric"><code>]</code>
+  </div>
+  <div class="slicer-pres">
+    <button class="chip-btn" data-p="1,4,">[1:4]</button><button class="chip-btn" data-p=",3,">[:3]</button><button class="chip-btn" data-p="-2,,">[-2:]</button><button class="chip-btn" data-p=",,2">[::2]</button><button class="chip-btn" data-p=",,-1">[::-1]</button><button class="chip-btn" data-p="4,1,-1">[4:1:-1]</button><button class="chip-btn" data-p="3,100,">[3:100]</button>
+  </div>
+  <div class="slicer-celdas"></div>
+  <div class="slicer-res"></div>
+</div></div></div><div class="col"><div class="win"><pre class="py" data-title="python — índices y slicing" data-run="1">nombres = ["Ana", "Luis", "Sofía", "Carlos"]
+print(nombres[0])     # Ana     -&gt; primer elemento
+print(nombres[-1])    # Carlos  -&gt; último, sin calcular len - 1
+print(nombres[-2])    # Sofía
+
+numeros = [10, 20, 30, 40, 50, 60]
+print(numeros[1:4])   # [20, 30, 40]  -&gt; el fin NO se incluye
+print(numeros[:2])    # [10, 20]      -&gt; desde el inicio
+print(numeros[3:])    # [40, 50, 60]  -&gt; hasta el final
+print(numeros[::2])   # [10, 30, 50]  -&gt; de a 2
+print(numeros[::-1])  # [60, 50, 40, 30, 20, 10] -&gt; invertida (copia)
+print(numeros[-3:])   # [40, 50, 60]  -&gt; los últimos 3
+print(numeros[4:100]) # [50, 60] -&gt; el slicing NUNCA lanza IndexError</pre></div><div class="win"><pre class="py" data-title="python — prevenir IndexError" data-run="1">nombres = ["Ana", "Luis", "Sofía", "Carlos"]
+i = 10
+
+# Opción 1: validar el rango ANTES de acceder
+if 0 &lt;= i &lt; len(nombres):
+    print(nombres[i])
+else:
+    print(f"El índice {i} no existe (válidos: 0 a {len(nombres) - 1})")
+
+# Opción 2: el último válido SIEMPRE es len - 1 (o -1)
+print(nombres[len(nombres) - 1])   # Carlos
+
+# Sin validar...
+print(nombres[i])                  # IndexError: list index out of range</pre></div><aside class="alerta"><div class="alerta-tit"><i class="fa-solid fa-triangle-exclamation"></i> Alerta de error típico: el error del “uno de más” (off-by-one)</div><p>Los tres casos que más se ven en clase:</p>
+<ul><li><code>lista[len(lista)]</code> → <b>IndexError</b>: el último es <code>len(lista) - 1</code>.</li>
+<li><code>for i in range(1, len(lista))</code> → se saltea el elemento de la posición 0.</li>
+<li><code>for i in range(len(lista) + 1)</code> → la última vuelta se pasa del rango.</li></ul>
+<p>Regla práctica: <code>range(len(lista))</code> genera exactamente los índices válidos.</p></aside><aside class="docente"><div class="docente-tit"><i class="fa-solid fa-chalkboard-user"></i> Nota para el docente</div><p>Con el simulador de slicing, pedí que <b>predigan</b> el resultado de <code>[4:1:-1]</code> antes de tocar el botón. Es un buen termómetro para ver si entendieron que el <i>fin</i> no se incluye también con paso negativo.</p></aside></div></div>
+</section>
+<section id="m2" class="seccion">
+<header class="sec-head">
+  <div class="sec-tit"><i class="fa-solid fa-screwdriver-wrench"></i><h2>Módulo 2: Métodos principales y trampas comunes</h2><span class="sec-sub">| Agregar, eliminar, reorganizar y no caer en None</span></div>
+  <div class="pills"><span class="pill"><i class="fa-regular fa-clock"></i> 30 min</span><span class="pill"><i class="fa-solid fa-gears"></i> Teoría + práctica</span></div>
+</header>
+
+<div class="card"><h3 class="card-tit"><i class="fa-solid fa-table c-blue"></i> Mapa de métodos</h3>
+<div class="tabla-wrap"><table class="tabla"><thead><tr><th>Método</th><th>Qué hace</th><th>Devuelve</th><th>Falla cuando…</th></tr></thead><tbody>
+<tr><td><code>t.append(x)</code></td><td>Agrega <code>x</code> al final</td><td class="none">None</td><td>—</td></tr>
+<tr><td><code>t.insert(i, x)</code></td><td>Inserta <code>x</code> en la posición <code>i</code> y corre el resto</td><td class="none">None</td><td>— (si <code>i</code> es enorme, agrega al final)</td></tr>
+<tr><td><code>t.remove(x)</code></td><td>Borra la <b>primera</b> aparición del <b>valor</b> <code>x</code></td><td class="none">None</td><td><code>ValueError</code> si <code>x</code> no está</td></tr>
+<tr><td><code>t.pop(i)</code></td><td>Quita el elemento de la <b>posición</b> <code>i</code> (por defecto, el último)</td><td class="val">el elemento</td><td><code>IndexError</code> si está vacía o <code>i</code> no existe</td></tr>
+<tr><td><code>t.clear()</code></td><td>Vacía la lista</td><td class="none">None</td><td>—</td></tr>
+<tr><td><code>t.sort()</code></td><td>Ordena la misma lista</td><td class="none">None</td><td><code>TypeError</code> con tipos mezclados</td></tr>
+<tr><td><code>sorted(t)</code></td><td>Crea una lista nueva ordenada</td><td class="val">lista nueva</td><td><code>TypeError</code> con tipos mezclados</td></tr>
+<tr><td><code>t.reverse()</code></td><td>Invierte el orden actual</td><td class="none">None</td><td>—</td></tr>
+</tbody></table></div>
+<p class="muted">La columna <b>Devuelve</b> es la clave del módulo: todo lo marcado como <span class="none">None</span> modifica la lista “en el lugar” (in-place).</p></div>
+
+<h3 class="subtema"><span class="subnum">2.1</span>Inserción y edición<span class="submin">5 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-circle-plus c-blue"></i> append() vs insert()</h3><p><code>append()</code> siempre agrega al <b>final</b> y es la operación más usada para acumular resultados en un bucle. <code>insert(i, x)</code> agrega en una posición concreta y <b>desplaza</b> a la derecha a todos los que estaban desde <code>i</code>.</p>
+<p>Para <b>editar</b> no hace falta ningún método: se asigna por índice, <code>t[i] = nuevo_valor</code>.</p></div><aside class="alerta"><div class="alerta-tit"><i class="fa-solid fa-triangle-exclamation"></i> Alerta de error típico: append de una lista</div><p><code>t.append([4, 5])</code> agrega <b>un solo elemento</b> (una sublista), no dos números. Si querés sumar varios elementos, usá <code>t.extend([4, 5])</code> o <code>t += [4, 5]</code>.</p></aside></div><div class="col"><div class="win"><pre class="py" data-title="python — append / insert / extend" data-run="1">compras = ["pan", "leche"]
+compras.append("huevos")        # agrega AL FINAL
+print(compras)                  # ['pan', 'leche', 'huevos']
+
+compras.insert(0, "café")       # inserta en la posición 0
+print(compras)                  # ['café', 'pan', 'leche', 'huevos']
+
+compras.insert(100, "sal")      # fuera de rango: NO falla, va al final
+print(compras)                  # ['café', 'pan', 'leche', 'huevos', 'sal']
+
+compras[1] = "pan integral"     # editar = asignar por índice
+print(compras)
+
+compras.append(["yerba", "azúcar"])   # ¡agrega UNA sola sublista!
+print(compras[-1], len(compras))      # ['yerba', 'azúcar'] 6
+
+compras.pop()                         # deshacemos
+compras.extend(["yerba", "azúcar"])   # agrega los dos por separado
+print(compras[-2:], len(compras))     # ['yerba', 'azúcar'] 7</pre></div></div></div>
+
+<h3 class="subtema"><span class="subnum">2.2</span>Eliminación<span class="submin">7 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-trash-can c-blue"></i> remove() vs pop() vs clear()</h3><div class="tiles t3"><div class="tile t-red"><div class="tile-tit"><i class="fa-solid fa-filter-circle-xmark"></i> remove(valor)</div><p>Busca por <b>valor</b> y borra la primera coincidencia.</p></div><div class="tile t-orange"><div class="tile-tit"><i class="fa-solid fa-hand-holding"></i> pop(índice)</div><p>Saca por <b>posición</b> y te <b>devuelve</b> el elemento.</p></div><div class="tile t-purple"><div class="tile-tit"><i class="fa-solid fa-broom"></i> clear()</div><p>Deja la lista vacía (la variable sigue existiendo).</p></div></div></div><aside class="alerta"><div class="alerta-tit"><i class="fa-solid fa-triangle-exclamation"></i> Alerta de error típico: borrar mientras recorrés</div><p>Eliminar elementos de la misma lista que estás recorriendo con <code>for</code> hace que se <b>salteen</b> elementos: al borrar, todo se corre una posición a la izquierda y el bucle avanza igual.</p><div class="win"><pre class="py" data-title="python — trampa del for" data-run="1">numeros = [2, 4, 5, 6, 8]
+for n in numeros:
+    if n % 2 == 0:
+        numeros.remove(n)
+print(numeros)        # [4, 5, 8]  &lt;- ¡quedaron pares!
+
+# Solución: construir una lista nueva con lo que queremos conservar
+numeros = [2, 4, 5, 6, 8]
+impares = []
+for n in numeros:
+    if n % 2 != 0:
+        impares.append(n)
+print(impares)        # [5]</pre></div></aside></div><div class="col"><div class="win"><pre class="py" data-title="python — remove / pop / clear" data-run="1">t = [5, 3, 8, 3, 1]
+t.remove(3)        # elimina la PRIMERA aparición del VALOR 3
+print(t)           # [5, 8, 3, 1]
+
+x = t.pop()        # quita y DEVUELVE el último
+print(x, t)        # 1 [5, 8, 3]
+
+y = t.pop(0)       # quita y devuelve el de la POSICIÓN 0
+print(y, t)        # 5 [8, 3]
+
+t.clear()          # vacía la lista
+print(t, len(t))   # [] 0
+
+# Eliminaciones seguras (patrón guardián en miniatura)
+if 7 in t:
+    t.remove(7)    # solo si existe -&gt; evita ValueError
+if t:
+    t.pop()        # solo si no está vacía -&gt; evita IndexError
+print("Sin errores:", t)</pre></div><div class="win"><pre class="py" data-title="python — ValueError" data-run="1">t = [5, 8]
+t.remove(7)     # ValueError: list.remove(x): x not in list</pre></div><div class="win"><pre class="py" data-title="python — pop en vacía" data-run="1">vacia = []
+vacia.pop()     # IndexError: pop from empty list</pre></div></div></div>
+
+<h3 class="subtema"><span class="subnum">2.3</span>Reorganización: sort() vs sorted() y reverse()<span class="submin">6 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-arrow-down-wide-short c-blue"></i> ¿Modifico o creo una nueva?</h3><div class="tabla-wrap"><table class="tabla"><thead><tr><th></th><th><code>t.sort()</code></th><th><code>sorted(t)</code></th></tr></thead><tbody>
+<tr><td>Tipo</td><td>Método de lista</td><td>Función integrada</td></tr>
+<tr><td>Modifica <code>t</code></td><td>Sí</td><td>No</td></tr>
+<tr><td>Devuelve</td><td class="none">None</td><td class="val">Lista nueva</td></tr>
+<tr><td>Funciona con</td><td>Solo listas</td><td>Cualquier iterable (str, tuple…)</td></tr>
+</tbody></table></div>
+<p>Lo mismo pasa con <code>t.reverse()</code> (modifica, devuelve <code>None</code>) frente a <code>t[::-1]</code> (crea una copia invertida). Ojo: <code>reverse()</code> <b>no ordena</b>, solo da vuelta el orden actual.</p></div><aside class="alerta"><div class="alerta-tit"><i class="fa-solid fa-triangle-exclamation"></i> Alerta de error típico: ordenar tipos mezclados</div><p><code>[3, "dos", 1].sort()</code> lanza <code>TypeError: '&lt;' not supported between instances of 'str' and 'int'</code>. Python no sabe si <code>"dos"</code> va antes o después de <code>3</code>. Ordená solo listas homogéneas.</p></aside></div><div class="col"><div class="win"><pre class="py" data-title="python — sort / sorted / reverse" data-run="1">notas = [7, 2, 9, 4]
+
+ordenada = sorted(notas)     # devuelve una lista NUEVA
+print(ordenada)              # [2, 4, 7, 9]
+print(notas)                 # [7, 2, 9, 4]  &lt;- la original intacta
+
+notas.sort()                 # ordena IN-PLACE (modifica la original)
+print(notas)                 # [2, 4, 7, 9]
+
+notas.sort(reverse=True)     # descendente
+print(notas)                 # [9, 7, 4, 2]
+
+notas.reverse()              # invierte el orden actual (no ordena)
+print(notas)                 # [2, 4, 7, 9]
+
+invertida = notas[::-1]      # alternativa que NO modifica
+print(invertida, notas)      # [9, 7, 4, 2] [2, 4, 7, 9]
+
+palabras = ["banana", "Zoe", "ana"]
+print(sorted(palabras))                  # ['Zoe', 'ana', 'banana'] -&gt; mayúsculas primero
+print(sorted(palabras, key=str.lower))   # ['ana', 'banana', 'Zoe'] -&gt; orden "humano"</pre></div></div></div>
+
+<h3 class="subtema"><span class="subnum">2.4</span>Operaciones in-place: por qué devuelven None<span class="submin">7 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-ban c-blue"></i> La regla de oro</h3><p>Los métodos que <b>modifican</b> la lista (<code>append</code>, <code>insert</code>, <code>extend</code>, <code>remove</code>, <code>sort</code>, <code>reverse</code>, <code>clear</code>) trabajan <b>in-place</b>: cambian el objeto existente y devuelven <code>None</code>. Es una decisión de diseño de Python para dejar claro que no se creó nada nuevo.</p>
+<div class="comparar"><div class="mal"><span>❌ Incorrecto</span><code>t = t.append(x)</code><code>t = t.sort()</code></div><div class="bien"><span>✅ Correcto</span><code>t.append(x)</code><code>t.sort()</code></div></div>
+<p>Si necesitás un valor de vuelta, usá las versiones que <b>crean</b>: <code>sorted(t)</code>, <code>t + [x]</code>, <code>t[::-1]</code>.</p></div><aside class="alerta"><div class="alerta-tit"><i class="fa-solid fa-triangle-exclamation"></i> Alerta de error típico: AttributeError: 'NoneType' object has no attribute…</div><p>Si ves este mensaje, casi siempre hay una línea anterior del estilo <code>t = t.algo()</code>. El error aparece <b>después</b>, no donde está el problema: por eso cuesta encontrarlo. Buscá hacia arriba la última vez que asignaste <code>t</code>.</p></aside></div><div class="col"><div class="win"><pre class="py" data-title="python — la trampa del None" data-run="1">t = [3, 1, 2]
+resultado = t.append(4)
+print(resultado)     # None -&gt; append NO devuelve la lista
+print(t)             # [3, 1, 2, 4] -&gt; la modificó en el lugar
+
+# El error clásico: reasignar el resultado
+t = t.sort()
+print(t)             # None -&gt; ¡perdiste la lista!
+
+t.append(5)          # AttributeError: 'NoneType' object has no attribute 'append' </pre></div></div></div>
+
+<h3 class="subtema"><span class="subnum">2.5</span>Errores de concatenación<span class="submin">5 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-plus c-blue"></i> <code>t + [x]</code> vs <code>t + x</code></h3><p>El operador <code>+</code> entre listas <b>solo acepta otra lista</b> y siempre crea una lista <b>nueva</b> (no modifica <code>t</code>). Para sumar un valor suelto, envolvelo en corchetes.</p>
+<div class="comparar"><div class="mal"><span>❌</span><code>t + 4</code><code>t + "hola"</code></div><div class="bien"><span>✅</span><code>t + [4]</code><code>t + ["hola"]</code></div></div></div><aside class="alerta"><div class="alerta-tit"><i class="fa-solid fa-triangle-exclamation"></i> Alerta de error típico: <code>+=</code> con un string</div><p><code>t += "ok"</code> <b>no falla</b>, pero agrega <b>letra por letra</b>: <code>[..., 'o', 'k']</code>. Es porque <code>+=</code> funciona como <code>extend()</code> y recorre el string. Usá <code>t.append("ok")</code> o <code>t += ["ok"]</code>.</p></aside></div><div class="col"><div class="win"><pre class="py" data-title="python — concatenación" data-run="1">t = [1, 2, 3]
+x = 4
+
+nueva = t + [x]      # lista + lista = lista NUEVA
+print(nueva)         # [1, 2, 3, 4]
+print(t)             # [1, 2, 3] &lt;- t no cambió
+
+t += [x]             # equivale a t.extend([x]) -&gt; modifica t
+print(t)             # [1, 2, 3, 4]
+
+t += "ok"            # trampa: agrega cada letra
+print(t)             # [1, 2, 3, 4, 'o', 'k']
+
+print([0] * 3)       # [0, 0, 0] -&gt; repetición
+
+t = t + x            # TypeError: can only concatenate list (not "int") to list</pre></div><aside class="docente"><div class="docente-tit"><i class="fa-solid fa-chalkboard-user"></i> Nota para el docente</div><p><b>Actividad rápida (3 min):</b> proyectá el bloque “la trampa del None” y pedí que, en parejas, encuentren la línea culpable <b>sin ejecutar</b>. Después ejecutalo y leé juntos el mensaje de error y la explicación que aparece debajo.</p></aside></div></div>
+</section>
+<section id="pausa" class="seccion pausa"><div class="pausa-in"><i class="fa-solid fa-mug-hot"></i><div><h2>Pausa · 10 minutos</h2><p>Volvemos con depuración: cómo encontrar errores sin adivinar.</p></div></div></section>
+<section id="m3" class="seccion">
+<header class="sec-head">
+  <div class="sec-tit"><i class="fa-solid fa-bug-slash"></i><h2>Módulo 3: Depuración y patrón guardián</h2><span class="sec-sub">| Ver qué pasa adentro y frenar los errores antes de que ocurran</span></div>
+  <div class="pills"><span class="pill"><i class="fa-regular fa-clock"></i> 15 min</span><span class="pill"><i class="fa-solid fa-gears"></i> Teoría + práctica</span></div>
+</header>
+
+<h3 class="subtema"><span class="subnum">3.1</span>print() estratégicos<span class="submin">7 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-magnifying-glass c-blue"></i> Dónde poner los print()</h3><div class="tiles t3"><div class="tile t-blue"><div class="tile-tit"><i class="fa-solid fa-flag"></i> Antes del bucle</div><p>El estado <b>inicial</b>: la lista y las variables acumuladoras.</p></div><div class="tile t-orange"><div class="tile-tit"><i class="fa-solid fa-rotate"></i> Dentro del bucle</div><p>Qué elemento se procesa y cómo cambian las variables en <b>cada vuelta</b>.</p></div><div class="tile t-green"><div class="tile-tit"><i class="fa-solid fa-flag-checkered"></i> Después</div><p>El <b>resultado</b> final, para compararlo con lo esperado.</p></div></div>
+<ul class="lista-ok"><li>Marcá los mensajes con un prefijo como <code>[DEBUG]</code> para encontrarlos y borrarlos después.</li>
+<li>Mostrá <code>len(lista)</code> y usá <code>!r</code> en f-strings para ver espacios ocultos: <code>f"{linea!r}"</code>.</li>
+<li>Para sospechas de aliasing, imprimí <code>id(a)</code> e <code>id(b)</code>.</li>
+<li>Cuando el programa crezca, el siguiente paso es el <b>depurador</b> del IDE (breakpoints), que hace lo mismo sin ensuciar el código.</li></ul></div></div><div class="col"><div class="win"><pre class="py" data-title="python — cazando un bug" data-run="1"># Objetivo: encontrar la temperatura máxima
+temperaturas = [-5, -2, -8, -1]
+maximo = 0                       # el bug está escondido acá
+
+print(f"[DEBUG] inicio: maximo={maximo}, lista={temperaturas}")
+for t in temperaturas:
+    if t &gt; maximo:
+        maximo = t
+    print(f"[DEBUG] t={t:&gt;3} -&gt; maximo={maximo}")
+
+print("Máximo:", maximo)         # 0 -&gt; ¡0 ni siquiera está en la lista!</pre></div><div class="win"><pre class="py" data-title="python — bug corregido" data-run="1"># Corrección: inicializar con un elemento REAL de la lista
+temperaturas = [-5, -2, -8, -1]
+maximo = temperaturas[0]
+for t in temperaturas[1:]:
+    if t &gt; maximo:
+        maximo = t
+print("Máximo:", maximo)         # -1</pre></div><aside class="docente"><div class="docente-tit"><i class="fa-solid fa-chalkboard-user"></i> Nota para el docente</div><p>Antes de ejecutar el bloque con bug, preguntá “¿qué debería imprimir?”. Cuando salga <code>0</code>, mirá con ellos la traza <code>[DEBUG]</code>: <code>maximo</code> nunca cambia. Este mismo error aparece en el ejercicio I2 del Módulo 4, así que conecta directo con la práctica.</p></aside></div></div>
+
+<h3 class="subtema"><span class="subnum">3.2</span>Patrón guardián (code guard)<span class="submin">8 min</span></h3>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-shield-halved c-blue"></i> Qué es un guardián</h3><p>Un <b>guardián</b> es una condición que se verifica <b>al principio</b> y corta el flujo si los datos no sirven: <code>continue</code> en un bucle, <code>return</code> en una función. El “camino feliz” queda sin anidar y el error nunca llega a ocurrir.</p>
+<div class="comparar"><div class="mal"><span>Sin guardián</span><code>primera = palabras[0]</code><small>💥 IndexError con líneas vacías</small></div><div class="bien"><span>Con guardián</span><code>if len(palabras) == 0:</code><code>&nbsp;&nbsp;&nbsp;&nbsp;continue</code><small>🛡️ salta la línea y sigue</small></div></div>
+<p>Forma más “pythónica”: <code>if not palabras:</code> (una lista vacía es falsa).</p></div><aside class="alerta"><div class="alerta-tit"><i class="fa-solid fa-triangle-exclamation"></i> Alerta de error típico: <code>split(" ")</code> no es lo mismo que <code>split()</code></div><p><code>"   ".split()</code> devuelve <code>[]</code>, pero <code>"   ".split(" ")</code> devuelve <code>['', '', '', '']</code>: ¡una lista de 4 strings vacíos! El guardián <code>len(palabras) == 0</code> no la detecta. Para separar palabras usá <code>split()</code> sin argumentos.</p></aside><div class="win"><pre class="py" data-title="python — con archivos" data-run="0"># En un archivo real, el guardián se ve así (no ejecutable acá)
+with open("alumnos.txt", encoding="utf-8") as archivo:
+    for linea in archivo:
+        datos = linea.strip().split(",")
+        if len(datos) &lt; 2:          # guardián: línea vacía o incompleta
+            continue
+        nombre, nota = datos[0], int(datos[1])
+        print(nombre, nota)</pre></div></div><div class="col"><div class="win"><pre class="py" data-title="python — sin guardián" data-run="1"># Simulamos las líneas de un archivo de texto
+lineas = ["Python es genial", "", "las listas son mutables", "   ", "fin del archivo"]
+
+for num, linea in enumerate(lineas, start=1):
+    palabras = linea.split()
+    primera = palabras[0]          # IndexError en la línea 2 (vacía)
+    print(num, primera)</pre></div><div class="win"><pre class="py" data-title="python — con guardián" data-run="1">lineas = ["Python es genial", "", "las listas son mutables", "   ", "fin del archivo"]
+
+for num, linea in enumerate(lineas, start=1):
+    palabras = linea.split()
+    if len(palabras) == 0:         # guardián: vacía o solo espacios
+        print(f"Línea {num}: vacía, se omite")
+        continue                   # salta a la próxima línea
+    print(f"Línea {num}: {len(palabras)} palabras, empieza con '{palabras[0]}'")</pre></div><div class="win"><pre class="py" data-title="python — guardián en funciones" data-run="1">def promedio(numeros):
+    if len(numeros) == 0:      # guardián: evita ZeroDivisionError
+        return None
+    total = 0
+    for n in numeros:
+        total += n
+    return total / len(numeros)
+
+print(promedio([8, 6, 10]))   # 8.0
+print(promedio([]))           # None, en vez de romper el programa</pre></div></div></div>
+</section>
+<section id="m4" class="seccion">
+<header class="sec-head">
+  <div class="sec-tit"><i class="fa-solid fa-dumbbell"></i><h2>Módulo 4: Práctica progresiva</h2><span class="sec-sub">| De lo directo al análisis de datos</span></div>
+  <div class="pills"><span class="pill"><i class="fa-regular fa-clock"></i> 30 min</span><span class="pill"><i class="fa-solid fa-laptop-code"></i> Práctica</span></div>
+</header>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-route c-blue"></i> Cómo usar esta práctica</h3><p>Los ejercicios suben de nivel. Cada uno tiene un editor para escribir y <b>ejecutar</b> tu solución, una pista y la solución explicada paso a paso. Intentá al menos un ejercicio de cada nivel antes de mirar la solución.</p>
+<div class="niveles"><span class="badge b-basico"><i class="fa-solid fa-seedling"></i> Básico · 5'</span><span class="badge b-intermedio"><i class="fa-solid fa-layer-group"></i> Intermedio · 10'</span><span class="badge b-avanzado"><i class="fa-solid fa-rocket"></i> Avanzado · 8'</span><span class="badge b-dios"><i class="fa-solid fa-crown"></i> Nivel Dios · 7'</span></div></div></div>
+<div class="col"><aside class="docente"><div class="docente-tit"><i class="fa-solid fa-chalkboard-user"></i> Nota para el docente</div><p><b>Dinámica sugerida:</b> trabajo en parejas (uno escribe, otro revisa, se rotan en cada nivel). Resolvé en vivo <b>I2</b> (conecta con el bug del Módulo 3) y <b>D1</b>; el resto queda como práctica. Si el grupo va rápido, D2 es un excelente desafío; si no, dejalo como tarea.</p>
+<p>Al circular por el aula, preguntá “¿qué imprime tu <code>[DEBUG]</code>?” antes de dar la respuesta.</p></aside></div></div>
+<h3 class="nivel-tit c-green"><i class="fa-solid fa-seedling"></i> Nivel básico: creación, modificación, append() y pop()</h3>
+<div class="ej-grid"><article class="ej n-basico" id="b1">
+  <div class="ej-head"><span class="ej-id">B1</span><h4>Primera y última fruta</h4><span class="badge b-basico"><i class="fa-solid fa-seedling"></i> Básico</span></div>
+  <div class="ej-enun"><p>Creá una lista con 5 frutas. Mostrá la primera y la última usando índices (sin escribir el número 4).</p></div><div class="salida-esp"><span>Salida esperada</span><pre>Primera: manzana
+Última: kiwi</pre></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="frutas = ["manzana", "banana", "pera", "uva", "kiwi"]
+# Mostrá la primera y la última
+">frutas = ["manzana", "banana", "pera", "uva", "kiwi"]
+# Mostrá la primera y la última
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p>La primera está en el índice <code>0</code>. Para la última, pensá en los índices negativos.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li>Accedé con <code>frutas[0]</code> a la primera posición.</li><li>Usá <code>frutas[-1]</code>: funciona aunque la lista cambie de tamaño, a diferencia de <code>frutas[4]</code>.</li></ol><div class="win"><pre class="py" data-title="python — solución B1" data-run="1">frutas = ["manzana", "banana", "pera", "uva", "kiwi"]
+print("Primera:", frutas[0])
+print("Última:", frutas[-1])</pre></div></div></details>
+</article><article class="ej n-basico" id="b2">
+  <div class="ej-head"><span class="ej-id">B2</span><h4>Modificación directa con append() y pop()</h4><span class="badge b-basico"><i class="fa-solid fa-seedling"></i> Básico</span></div>
+  <div class="ej-enun"><p>Partiendo de la lista del ejercicio anterior: (1) reemplazá <code>"pera"</code> por <code>"naranja"</code> usando su índice, (2) agregá <code>"mango"</code> al final, (3) eliminá el último elemento con <code>pop()</code> mostrando cuál se eliminó, y (4) imprimí la lista final.</p></div><div class="salida-esp"><span>Salida esperada</span><pre>Con mango: ['manzana', 'banana', 'naranja', 'uva', 'kiwi', 'mango']
+Eliminada: mango
+Final: ['manzana', 'banana', 'naranja', 'uva', 'kiwi']</pre></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="frutas = ["manzana", "banana", "pera", "uva", "kiwi"]
+">frutas = ["manzana", "banana", "pera", "uva", "kiwi"]
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p><code>"pera"</code> está en la posición 2. Recordá que <code>pop()</code> <b>devuelve</b> lo que saca: guardalo en una variable.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li>Asignación por índice: <code>frutas[2] = "naranja"</code>.</li><li><code>append()</code> modifica la lista: no hay que reasignarla.</li><li><code>eliminada = frutas.pop()</code> guarda el valor quitado (es <code>"mango"</code>, el último).</li></ol><div class="win"><pre class="py" data-title="python — solución B2" data-run="1">frutas = ["manzana", "banana", "pera", "uva", "kiwi"]
+frutas[2] = "naranja"          # 1. editar por índice
+frutas.append("mango")         # 2. agregar al final (sin reasignar)
+print("Con mango:", frutas)
+eliminada = frutas.pop()       # 3. pop devuelve el elemento quitado
+print("Eliminada:", eliminada)
+print("Final:", frutas)        # 4. lista final</pre></div></div></details>
+</article><article class="ej n-basico" id="b3">
+  <div class="ej-head"><span class="ej-id">B3</span><h4>Fila de atención</h4><span class="badge b-basico"><i class="fa-solid fa-seedling"></i> Básico</span></div>
+  <div class="ej-enun"><p>Simulá la fila de un mostrador: empezá con una lista vacía, agregá 3 clientes con <code>append()</code> y después atendelos <b>en orden de llegada</b> con <code>pop(0)</code> hasta que la fila quede vacía.</p></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="fila = []
+# Agregá 3 clientes y atendelos en orden
+">fila = []
+# Agregá 3 clientes y atendelos en orden
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p>Un <code>while fila:</code> repite mientras la lista tenga elementos. Es un guardián dentro del propio bucle.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li>Tres <code>append()</code> llenan la fila en orden de llegada.</li><li><code>while fila:</code> se detiene solo cuando la lista queda vacía, así <code>pop(0)</code> nunca falla.</li><li><code>pop(0)</code> saca el primero (el que llegó antes); <code>pop()</code> sacaría el último.</li></ol><div class="win"><pre class="py" data-title="python — solución B3" data-run="1">fila = []
+fila.append("Ana")
+fila.append("Luis")
+fila.append("Sofía")
+print("Fila:", fila)
+
+while fila:                    # guardián: corta cuando está vacía
+    cliente = fila.pop(0)      # el primero que llegó
+    print("Atendiendo a", cliente, "| quedan", len(fila))
+print("Fila vacía:", fila)</pre></div></div></details>
+</article></div>
+<h3 class="nivel-tit c-orange"><i class="fa-solid fa-layer-group"></i> Nivel intermedio: filtrado, estadísticas manuales y random</h3>
+<div class="ej-grid"><article class="ej n-intermedio" id="i1">
+  <div class="ej-head"><span class="ej-id">I1</span><h4>Aprobados y desaprobados</h4><span class="badge b-intermedio"><i class="fa-solid fa-layer-group"></i> Intermedio</span></div>
+  <div class="ej-enun"><p>Dada la lista de notas, generá dos listas nuevas: <code>aprobados</code> (nota ≥ 4) y <code>desaprobados</code>. Mostrá ambas, cuántas hay en cada una y el porcentaje de aprobación.</p></div><div class="salida-esp"><span>Salida esperada</span><pre>Aprobados: [7, 9, 4, 10, 6] -&gt; 5
+Desaprobados: [3, 2, 1] -&gt; 3
+Aprobación: 62.5%</pre></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="notas = [7, 3, 9, 4, 2, 10, 6, 1]
+">notas = [7, 3, 9, 4, 2, 10, 6, 1]
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p>Creá las dos listas vacías <b>antes</b> del <code>for</code> y usá <code>append()</code> dentro de un <code>if/else</code>.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li>Inicializá <code>aprobados = []</code> y <code>desaprobados = []</code> fuera del bucle (si lo hacés adentro, se vacían en cada vuelta).</li><li>Recorré <code>notas</code> con <code>for nota in notas</code>.</li><li>Con <code>if nota &gt;= 4</code> decidí a qué lista va cada nota y agregala con <code>append()</code>.</li><li>El porcentaje es <code>len(aprobados) / len(notas) * 100</code>. Agregá un guardián por si la lista de notas está vacía.</li></ol><div class="win"><pre class="py" data-title="python — solución I1" data-run="1">notas = [7, 3, 9, 4, 2, 10, 6, 1]
+aprobados = []
+desaprobados = []
+
+for nota in notas:
+    if nota &gt;= 4:
+        aprobados.append(nota)
+    else:
+        desaprobados.append(nota)
+
+print("Aprobados:", aprobados, "-&gt;", len(aprobados))
+print("Desaprobados:", desaprobados, "-&gt;", len(desaprobados))
+if len(notas) &gt; 0:                       # guardián
+    porcentaje = len(aprobados) / len(notas) * 100
+    print(f"Aprobación: {porcentaje:.1f}%")</pre></div></div></details>
+</article><article class="ej n-intermedio" id="i2">
+  <div class="ej-head"><span class="ej-id">I2</span><h4>Estadísticas a mano (sin sum() ni max())</h4><span class="badge b-intermedio"><i class="fa-solid fa-layer-group"></i> Intermedio</span></div>
+  <div class="ej-enun"><p>Calculá la suma, el promedio, la nota máxima, la mínima y la <b>posición</b> de la máxima, recorriendo la lista una sola vez. Prohibido usar <code>sum()</code>, <code>max()</code> y <code>min()</code>.</p></div><div class="salida-esp"><span>Salida esperada</span><pre>Suma: 42
+Promedio: 5.25
+Máximo: 10 en la posición 5
+Mínimo: 1</pre></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="notas = [7, 3, 9, 4, 2, 10, 6, 1]
+">notas = [7, 3, 9, 4, 2, 10, 6, 1]
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p>Acordate del bug del Módulo 3: el máximo y el mínimo se inicializan con un elemento <b>real</b> de la lista, no con 0.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li>Guardián: si la lista está vacía no hay estadísticas posibles.</li><li>Inicializá <code>total = 0</code>, <code>maximo = notas[0]</code>, <code>minimo = notas[0]</code> y <code>pos_max = 0</code>.</li><li>Recorré con <code>for i in range(len(notas))</code>: necesitás el índice para recordar la posición del máximo.</li><li>En cada vuelta acumulá en <code>total</code> y compará contra <code>maximo</code> y <code>minimo</code>.</li><li>Al final, <code>promedio = total / len(notas)</code>.</li></ol><div class="tabla-wrap"><table class="tabla traza"><thead><tr><th>i</th><th>notas[i]</th><th>total</th><th>maximo</th><th>pos_max</th><th>minimo</th></tr></thead><tbody><tr><td>0</td><td>7</td><td>7</td><td>7</td><td>0</td><td>7</td></tr><tr><td>1</td><td>3</td><td>10</td><td>7</td><td>0</td><td>3</td></tr><tr><td>2</td><td>9</td><td>19</td><td>9</td><td>2</td><td>3</td></tr><tr><td>3</td><td>4</td><td>23</td><td>9</td><td>2</td><td>3</td></tr><tr><td>4</td><td>2</td><td>25</td><td>9</td><td>2</td><td>2</td></tr><tr><td>5</td><td>10</td><td>35</td><td>10</td><td>5</td><td>2</td></tr><tr><td>6</td><td>6</td><td>41</td><td>10</td><td>5</td><td>2</td></tr><tr><td>7</td><td>1</td><td>42</td><td>10</td><td>5</td><td>1</td></tr></tbody></table></div><div class="win"><pre class="py" data-title="python — solución I2" data-run="1">notas = [7, 3, 9, 4, 2, 10, 6, 1]
+
+if len(notas) == 0:                  # guardián
+    print("No hay notas para analizar")
+else:
+    total = 0
+    maximo = notas[0]                # inicializar con un dato REAL
+    minimo = notas[0]
+    pos_max = 0
+    for i in range(len(notas)):
+        total += notas[i]
+        if notas[i] &gt; maximo:
+            maximo = notas[i]
+            pos_max = i
+        if notas[i] &lt; minimo:
+            minimo = notas[i]
+    promedio = total / len(notas)
+    print("Suma:", total)
+    print(f"Promedio: {promedio:.2f}")
+    print("Máximo:", maximo, "en la posición", pos_max)
+    print("Mínimo:", minimo)</pre></div></div></details>
+</article><article class="ej n-intermedio" id="i3">
+  <div class="ej-head"><span class="ej-id">I3</span><h4>Números aleatorios: pares e impares</h4><span class="badge b-intermedio"><i class="fa-solid fa-layer-group"></i> Intermedio</span></div>
+  <div class="ej-enun"><p>Usá <code>random.randint()</code> para generar una lista de 10 números entre 1 y 100. Separalos en dos listas, <code>pares</code> e <code>impares</code>, y mostrá el mayor número par (sin <code>max()</code>). Si no salió ningún par, avisalo.</p></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="import random
+random.seed(42)   # misma "suerte" para toda la clase
+
+numeros = []
+">import random
+random.seed(42)   # misma "suerte" para toda la clase
+
+numeros = []
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p><code>random.randint(1, 100)</code> incluye ambos extremos. Un número es par si <code>n % 2 == 0</code>. Para el mayor par, inicializá con <code>None</code> y usá un guardián.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li>Con <code>for _ in range(10)</code> + <code>append()</code> generás la lista.</li><li><code>random.seed(42)</code> hace que todos obtengan los mismos números: muy útil para corregir en clase.</li><li>Separá con <code>%</code> en dos listas.</li><li>Para el mayor par empezá con <code>mayor_par = None</code>: así sirve aunque no haya pares, y el guardián final lo detecta.</li></ol><div class="win"><pre class="py" data-title="python — solución I3" data-run="1">import random
+random.seed(42)
+
+numeros = []
+for _ in range(10):
+    numeros.append(random.randint(1, 100))
+print("Generados:", numeros)
+
+pares = []
+impares = []
+for n in numeros:
+    if n % 2 == 0:
+        pares.append(n)
+    else:
+        impares.append(n)
+print("Pares:", pares)
+print("Impares:", impares)
+
+mayor_par = None
+for p in pares:
+    if mayor_par is None or p &gt; mayor_par:
+        mayor_par = p
+if mayor_par is None:                 # guardián
+    print("No salió ningún número par")
+else:
+    print("Mayor par:", mayor_par)</pre></div></div></details>
+</article></div>
+<h3 class="nivel-tit c-red"><i class="fa-solid fa-rocket"></i> Nivel avanzado: textos, duplicados y paso negativo</h3>
+<div class="ej-grid"><article class="ej n-avanzado" id="a1">
+  <div class="ej-head"><span class="ej-id">A1</span><h4>Procesar un texto con split()</h4><span class="badge b-avanzado"><i class="fa-solid fa-rocket"></i> Avanzado</span></div>
+  <div class="ej-enun"><p>Dada una frase: (1) separala en palabras, (2) mostrá cuántas tiene, (3) encontrá la palabra más larga y (4) contá cuántas veces aparece <code>"mucho"</code>. Agregá un guardián para la frase vacía.</p></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="frase = "el que lee mucho y anda mucho ve mucho y sabe mucho"
+">frase = "el que lee mucho y anda mucho ve mucho y sabe mucho"
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p><code>frase.split()</code> devuelve una lista de palabras. Para la más larga compará <code>len(palabra)</code>. Para contar existe <code>.count()</code>.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li><code>palabras = frase.split()</code> convierte el texto en lista (sin argumentos, también ignora espacios repetidos).</li><li>Guardián: <code>if not palabras:</code> cubre frases vacías o solo con espacios.</li><li>Para la más larga, recorré guardando la mejor hasta el momento (mismo patrón que el máximo de I2).</li><li><code>palabras.count("mucho")</code> cuenta coincidencias exactas.</li></ol><div class="win"><pre class="py" data-title="python — solución A1" data-run="1">frase = "el que lee mucho y anda mucho ve mucho y sabe mucho"
+palabras = frase.split()
+
+if not palabras:                       # guardián
+    print("La frase está vacía")
+else:
+    print("Palabras:", palabras)
+    print("Cantidad:", len(palabras))
+    mas_larga = palabras[0]
+    for p in palabras:
+        if len(p) &gt; len(mas_larga):
+            mas_larga = p
+    print("Más larga:", mas_larga)
+    print("'mucho' aparece", palabras.count("mucho"), "veces")</pre></div></div></details>
+</article><article class="ej n-avanzado" id="a2">
+  <div class="ej-head"><span class="ej-id">A2</span><h4>Lista sin duplicados (respetando el orden)</h4><span class="badge b-avanzado"><i class="fa-solid fa-rocket"></i> Avanzado</span></div>
+  <div class="ej-enun"><p>Construí una lista nueva <code>unicos</code> con los valores de <code>original</code> sin repetir, manteniendo el orden de primera aparición. Después, aplicalo a las palabras de la frase de A1.</p></div><div class="salida-esp"><span>Salida esperada</span><pre>[3, 1, 2, 5]
+['el', 'que', 'lee', 'mucho', 'y', 'anda', 've', 'sabe']</pre></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="original = [3, 1, 3, 2, 1, 5, 2]
+">original = [3, 1, 3, 2, 1, 5, 2]
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p>Antes de agregar un elemento, preguntá si ya está: <code>if n not in unicos</code>.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li>Creá <code>unicos = []</code>.</li><li>Recorré <code>original</code>; si el elemento <b>no</b> está en <code>unicos</code>, agregalo.</li><li>¿Por qué no <code>set()</code>? Un conjunto elimina duplicados pero <b>no garantiza el orden</b>.</li></ol><div class="win"><pre class="py" data-title="python — solución A2" data-run="1">original = [3, 1, 3, 2, 1, 5, 2]
+unicos = []
+for n in original:
+    if n not in unicos:
+        unicos.append(n)
+print(unicos)                 # [3, 1, 2, 5]
+
+palabras = "el que lee mucho y anda mucho ve mucho y sabe mucho".split()
+vocabulario = []
+for p in palabras:
+    if p not in vocabulario:
+        vocabulario.append(p)
+print(vocabulario)</pre></div></div></details>
+</article><article class="ej n-avanzado" id="a3">
+  <div class="ej-head"><span class="ej-id">A3</span><h4>Recorrido con paso negativo</h4><span class="badge b-avanzado"><i class="fa-solid fa-rocket"></i> Avanzado</span></div>
+  <div class="ej-enun"><p>(1) Imprimí la lista de atrás hacia adelante con <code>range()</code> y paso <code>-1</code>, mostrando índice y valor. (2) Eliminá los duplicados <b>en la misma lista</b> usando solo <code>pop(índice)</code> (sin <code>remove()</code> ni listas auxiliares).</p></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="t = [3, 1, 3, 2, 1, 5, 2]
+">t = [3, 1, 3, 2, 1, 5, 2]
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p><code>range(len(t) - 1, -1, -1)</code> va desde el último índice hasta 0. El fin es <code>-1</code> porque no se incluye. Recorrer al revés permite hacer <code>pop(i)</code> sin desordenar los índices que faltan visitar.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li><code>range(inicio, fin, paso)</code> con <code>inicio = len(t) - 1</code>, <code>fin = -1</code> y <code>paso = -1</code>.</li><li>Para cada posición <code>i</code>, el elemento es repetido si ya aparece <b>antes</b>: <code>t[i] in t[:i]</code>.</li><li>Si es repetido, <code>t.pop(i)</code>. Como vamos de atrás para adelante, los índices menores no se corren: ¡por eso funciona!</li><li>Probalo recorriendo hacia adelante y vas a ver el mismo problema que en la alerta “borrar mientras recorrés”.</li></ol><div class="win"><pre class="py" data-title="python — solución A3" data-run="1">t = [3, 1, 3, 2, 1, 5, 2]
+
+# 1. Recorrido inverso con índices
+for i in range(len(t) - 1, -1, -1):
+    print(f"t[{i}] = {t[i]}")
+
+# 2. Sin duplicados, in-place, solo con pop()
+for i in range(len(t) - 1, -1, -1):
+    if t[i] in t[:i]:          # ¿ya apareció antes?
+        t.pop(i)
+print(t)                       # [3, 1, 2, 5]</pre></div></div></details>
+</article></div>
+<h3 class="nivel-tit c-purple"><i class="fa-solid fa-crown"></i> Nivel Dios: algoritmos integradores de análisis de datos</h3>
+<div class="ej-grid dios"><article class="ej n-dios" id="d1">
+  <div class="ej-head"><span class="ej-id">D1</span><h4>Racha más larga de crecimiento</h4><span class="badge b-dios"><i class="fa-solid fa-crown"></i> Nivel Dios</span></div>
+  <div class="ej-enun"><p>Una empresa registró sus ventas diarias. Encontrá la <b>racha más larga de días consecutivos en que las ventas crecieron</b> respecto del día anterior. Mostrá la cantidad de días, los índices de inicio y fin, y los valores de esa racha. Un solo recorrido, sin funciones de librería.</p></div><div class="salida-esp"><span>Salida esperada</span><pre>Días de la racha: 5
+Desde el índice 3 hasta el 7
+Valores: [140, 145, 160, 175, 190]</pre></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="ventas = [120, 135, 150, 140, 145, 160, 175, 190, 185, 200]
+">ventas = [120, 135, 150, 140, 145, 160, 175, 190, 185, 200]
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p>Llevá dos “memorias”: la racha <b>actual</b> (dónde empezó y cuánto mide) y la <b>mejor</b> vista hasta ahora. Compará cada día con el anterior: <code>ventas[i] &gt; ventas[i - 1]</code>.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><ol class="pasos"><li>Guardián: con una lista vacía no hay racha.</li><li>Una racha mínima mide 1 día: arrancá con <code>inicio_actual = 0</code>, <code>largo_actual = 1</code> y la mejor igual.</li><li>Recorré desde <code>i = 1</code> (cada día se compara con el anterior). Si creció, <code>largo_actual += 1</code>; si no, la racha se corta y empieza otra en <code>i</code>.</li><li>Después de actualizar, si <code>largo_actual</code> supera al mejor, guardá inicio y largo.</li><li>El fin es <code>mejor_inicio + mejor_largo - 1</code> y los valores salen con slicing.</li></ol><div class="tabla-wrap"><table class="tabla traza"><thead><tr><th>i</th><th>ventas[i-1] → ventas[i]</th><th>¿creció?</th><th>inicio_actual</th><th>largo_actual</th><th>mejor (inicio, largo)</th></tr></thead><tbody><tr><td>1</td><td>120 → 135</td><td>sí</td><td>0</td><td>2</td><td>(0, 2)</td></tr><tr><td>2</td><td>135 → 150</td><td>sí</td><td>0</td><td>3</td><td>(0, 3)</td></tr><tr><td>3</td><td>150 → 140</td><td>no</td><td>3</td><td>1</td><td>(0, 3)</td></tr><tr><td>4</td><td>140 → 145</td><td>sí</td><td>3</td><td>2</td><td>(0, 3)</td></tr><tr><td>5</td><td>145 → 160</td><td>sí</td><td>3</td><td>3</td><td>(0, 3)</td></tr><tr><td>6</td><td>160 → 175</td><td>sí</td><td>3</td><td>4</td><td>(3, 4)</td></tr><tr><td>7</td><td>175 → 190</td><td>sí</td><td>3</td><td>5</td><td>(3, 5)</td></tr><tr><td>8</td><td>190 → 185</td><td>no</td><td>8</td><td>1</td><td>(3, 5)</td></tr><tr><td>9</td><td>185 → 200</td><td>sí</td><td>8</td><td>2</td><td>(3, 5)</td></tr></tbody></table></div><div class="win"><pre class="py" data-title="python — solución D1" data-run="1">ventas = [120, 135, 150, 140, 145, 160, 175, 190, 185, 200]
+
+if len(ventas) == 0:                        # guardián
+    print("Sin datos")
+else:
+    inicio_actual, largo_actual = 0, 1
+    mejor_inicio, mejor_largo = 0, 1
+
+    for i in range(1, len(ventas)):
+        if ventas[i] &gt; ventas[i - 1]:       # el día creció
+            largo_actual += 1
+        else:                               # se corta: nueva racha en i
+            inicio_actual = i
+            largo_actual = 1
+        if largo_actual &gt; mejor_largo:      # ¿superó al récord?
+            mejor_largo = largo_actual
+            mejor_inicio = inicio_actual
+
+    fin = mejor_inicio + mejor_largo - 1
+    print("Días de la racha:", mejor_largo)
+    print("Desde el índice", mejor_inicio, "hasta el", fin)
+    print("Valores:", ventas[mejor_inicio:fin + 1])</pre></div></div></details>
+</article><article class="ej n-dios" id="d2">
+  <div class="ej-head"><span class="ej-id">D2</span><h4>Subtramo de suma máxima</h4><span class="badge b-dios"><i class="fa-solid fa-crown"></i> Nivel Dios</span></div>
+  <div class="ej-enun"><p>La lista tiene las ganancias (+) y pérdidas (−) diarias de un negocio. Encontrá el <b>tramo de días consecutivos</b> cuya suma sea la <b>mayor posible</b>. Mostrá la suma, los índices y los valores del tramo. Primero resolvelo “a fuerza bruta” y después intentá hacerlo en un solo recorrido.</p></div><div class="salida-esp"><span>Salida esperada</span><pre>Suma máxima: 6
+Tramo: 2 a 5 -&gt; [4, -1, 2, 1]</pre></div>
+  <div class="practica"><div class="practica-bar"><span><i class="fa-solid fa-keyboard"></i> Tu solución</span><span class="practica-btns"><button class="btn-sec js-reset">Restaurar</button><button class="btn-run js-run-ej"><i class="fa-solid fa-play"></i> Ejecutar</button></span></div>
+  <textarea class="editor" spellcheck="false" data-start="variaciones = [3, -5, 4, -1, 2, 1, -6, 2]
+">variaciones = [3, -5, 4, -1, 2, 1, -6, 2]
+</textarea><pre class="consola" hidden></pre></div>
+  <details class="pista"><summary><i class="fa-regular fa-lightbulb"></i> Ver pista</summary><div><p>Fuerza bruta: dos <code>for</code> anidados (inicio <code>i</code> y fin <code>j</code>) acumulando la suma. Versión eficiente: si lo que venías acumulando <b>te resta</b>, conviene empezar de nuevo en el día actual.</p></div></details>
+  <details class="solucion"><summary><i class="fa-solid fa-key"></i> Ver solución explicada</summary><div><h5>Idea 1: fuerza bruta (probar todos los tramos)</h5><ol class="pasos"><li>Para cada inicio <code>i</code>, sumá hacia adelante con <code>j</code> desde <code>i</code> hasta el final.</li><li>Cada vez que <code>suma</code> supere al mejor, guardá la suma, <code>i</code> y <code>j</code>.</li><li>Hace del orden de n² comparaciones: con 8 datos es instantáneo, con un millón no.</li></ol><div class="win"><pre class="py" data-title="python — solución D2A" data-run="1">variaciones = [3, -5, 4, -1, 2, 1, -6, 2]
+
+mejor = variaciones[0]
+ini, fin = 0, 0
+for i in range(len(variaciones)):
+    suma = 0
+    for j in range(i, len(variaciones)):
+        suma += variaciones[j]
+        if suma &gt; mejor:
+            mejor, ini, fin = suma, i, j
+
+print("Suma máxima:", mejor)
+print("Tramo:", ini, "a", fin, "-&gt;", variaciones[ini:fin + 1])</pre></div><h5>Idea 2: un solo recorrido (algoritmo de Kadane)</h5><ol class="pasos"><li><code>actual</code> = mejor suma de un tramo que <b>termina</b> en el día <code>i</code>.</li><li>En cada día hay dos opciones: <b>continuar</b> el tramo (<code>actual + v[i]</code>) o <b>empezar de nuevo</b> (<code>v[i]</code>). Quedate con la mayor.</li><li>Si empezás de nuevo, recordá dónde (<code>ini_actual = i</code>).</li><li>Si <code>actual</code> supera a <code>mejor</code>, guardá el tramo completo.</li></ol><div class="tabla-wrap"><table class="tabla traza"><thead><tr><th>i</th><th>v[i]</th><th>¿continuar o reiniciar?</th><th>actual</th><th>ini_actual</th><th>mejor (ini, fin)</th></tr></thead><tbody><tr><td>0</td><td>3</td><td>inicio</td><td>3</td><td>0</td><td>3 (0, 0)</td></tr><tr><td>1</td><td>-5</td><td>continuar: −2 ≥ −5</td><td>-2</td><td>0</td><td>3 (0, 0)</td></tr><tr><td>2</td><td>4</td><td>reiniciar: 2 &lt; 4</td><td>4</td><td>2</td><td>4 (2, 2)</td></tr><tr><td>3</td><td>-1</td><td>continuar</td><td>3</td><td>2</td><td>4 (2, 2)</td></tr><tr><td>4</td><td>2</td><td>continuar</td><td>5</td><td>2</td><td>5 (2, 4)</td></tr><tr><td>5</td><td>1</td><td>continuar</td><td>6</td><td>2</td><td>6 (2, 5)</td></tr><tr><td>6</td><td>-6</td><td>continuar</td><td>0</td><td>2</td><td>6 (2, 5)</td></tr><tr><td>7</td><td>2</td><td>continuar: 2 = 2</td><td>2</td><td>2</td><td>6 (2, 5)</td></tr></tbody></table></div><div class="win"><pre class="py" data-title="python — solución D2B" data-run="1">variaciones = [3, -5, 4, -1, 2, 1, -6, 2]
+
+if not variaciones:                         # guardián
+    print("Sin datos")
+else:
+    actual = mejor = variaciones[0]
+    ini_actual = ini = fin = 0
+    for i in range(1, len(variaciones)):
+        if actual + variaciones[i] &lt; variaciones[i]:   # conviene reiniciar
+            actual = variaciones[i]
+            ini_actual = i
+        else:                                          # conviene continuar
+            actual += variaciones[i]
+        if actual &gt; mejor:
+            mejor, ini, fin = actual, ini_actual, i
+
+    print("Suma máxima:", mejor)
+    print("Tramo:", ini, "a", fin, "-&gt;", variaciones[ini:fin + 1])</pre></div></div></details>
+</article></div>
+</section>
+<section id="cierre" class="seccion">
+<header class="sec-head">
+  <div class="sec-tit"><i class="fa-solid fa-circle-check"></i><h2>Cierre: repaso relámpago</h2><span class="sec-sub">| ¿Qué imprime? Respondé y verificá</span></div>
+  <div class="pills"><span class="pill"><i class="fa-regular fa-clock"></i> 5 min</span><span class="pill"><i class="fa-solid fa-graduation-cap"></i> Resumen</span></div>
+</header>
+<div class="row2"><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-bolt c-blue"></i> ¿Qué imprime?</h3><div class="quiz"><div class="q" data-exp="b es un alias de a: es la misma lista."><div class="q-num">1</div><div class="q-body"><pre class="py q-code" data-run="0" data-bare="1">a = [1, 2]
+b = a
+b.append(3)
+print(a)</pre><div class="q-ops"><button class="q-op" data-ok="0">[1, 2]</button><button class="q-op" data-ok="1">[1, 2, 3]</button><button class="q-op" data-ok="0">Error</button><button class="q-op" data-ok="0">None</button></div><p class="q-fb" aria-live="polite"></p></div></div><div class="q" data-exp="sort() trabaja in-place y devuelve None; al reasignar, t pasa a valer None."><div class="q-num">2</div><div class="q-body"><pre class="py q-code" data-run="0" data-bare="1">t = [3, 1, 2]
+t = t.sort()
+print(t)</pre><div class="q-ops"><button class="q-op" data-ok="0">[1, 2, 3]</button><button class="q-op" data-ok="0">[3, 1, 2]</button><button class="q-op" data-ok="1">None</button><button class="q-op" data-ok="0">Error</button></div><p class="q-fb" aria-live="polite"></p></div></div><div class="q" data-exp="El fin no se incluye: posiciones 1 y 2."><div class="q-num">3</div><div class="q-body"><pre class="py q-code" data-run="0" data-bare="1">t = [10, 20, 30, 40]
+print(t[1:3])</pre><div class="q-ops"><button class="q-op" data-ok="0">[10, 20, 30]</button><button class="q-op" data-ok="1">[20, 30]</button><button class="q-op" data-ok="0">[20, 30, 40]</button><button class="q-op" data-ok="0">[10, 20]</button></div><p class="q-fb" aria-live="polite"></p></div></div><div class="q" data-exp="remove() borra solo la primera aparición."><div class="q-num">4</div><div class="q-body"><pre class="py q-code" data-run="0" data-bare="1">t = [5, 5, 7]
+t.remove(5)
+print(t)</pre><div class="q-ops"><button class="q-op" data-ok="0">[7]</button><button class="q-op" data-ok="1">[5, 7]</button><button class="q-op" data-ok="0">[5, 5]</button><button class="q-op" data-ok="0">ValueError</button></div><p class="q-fb" aria-live="polite"></p></div></div><div class="q" data-exp="Solo se puede concatenar lista + lista: debería ser t + [3]."><div class="q-num">5</div><div class="q-body"><pre class="py q-code" data-run="0" data-bare="1">t = [1, 2]
+t = t + 3
+print(t)</pre><div class="q-ops"><button class="q-op" data-ok="0">[1, 2, 3]</button><button class="q-op" data-ok="0">[4, 5]</button><button class="q-op" data-ok="1">TypeError</button><button class="q-op" data-ok="0">None</button></div><p class="q-fb" aria-live="polite"></p></div></div><div class="q" data-exp="split() sin argumentos ignora los espacios: la lista queda vacía."><div class="q-num">6</div><div class="q-body"><pre class="py q-code" data-run="0" data-bare="1">palabras = '   '.split()
+print(len(palabras))</pre><div class="q-ops"><button class="q-op" data-ok="1">0</button><button class="q-op" data-ok="0">1</button><button class="q-op" data-ok="0">3</button><button class="q-op" data-ok="0">4</button></div><p class="q-fb" aria-live="polite"></p></div></div></div><p class="q-score" id="q-score">Respondidas: 0 de 6</p></div></div><div class="col"><div class="card"><h3 class="card-tit"><i class="fa-solid fa-book c-blue"></i> ¿Qué aprendimos hoy?</h3><div class="tiles t2"><div class="tile t-blue"><div class="tile-tit"><i class="fa-solid fa-check"></i> Mutabilidad</div><p>Asignar no copia. Copias seguras: <code>[:]</code>, <code>.copy()</code>.</p></div><div class="tile t-green"><div class="tile-tit"><i class="fa-solid fa-check"></i> Índices y slicing</div><p>Último índice: <code>len - 1</code> o <code>-1</code>. El fin no se incluye.</p></div><div class="tile t-orange"><div class="tile-tit"><i class="fa-solid fa-check"></i> Métodos in-place</div><p>Devuelven <code>None</code>: nunca <code>t = t.append(x)</code>.</p></div><div class="tile t-purple"><div class="tile-tit"><i class="fa-solid fa-check"></i> Guardianes</div><p>Validar primero: <code>if not lista: continue</code>.</p></div></div></div><div class="card"><h3 class="card-tit"><i class="fa-solid fa-clipboard-check c-blue"></i> Checklist antes de entregar código</h3><ul class="lista-ok">
+<li>¿Inicialicé acumuladores y máximos con valores correctos?</li>
+<li>¿Reasigné el resultado de algún método in-place?</li>
+<li>¿Puede llegar una lista vacía? ¿Tengo guardián?</li>
+<li>¿Estoy modificando la lista que recorro?</li>
+<li>¿Borré los <code>print("[DEBUG]")</code>?</li></ul></div><div class="card"><h3 class="card-tit"><i class="fa-solid fa-house-laptop c-blue"></i> Tarea</h3><p>Terminar los ejercicios de nivel avanzado y <b>D2</b>. Extra: adaptar <b>D1</b> para detectar la racha más larga de <b>caída</b> y probarlo con una lista vacía y con una de un solo elemento.</p></div><aside class="docente"><div class="docente-tit"><i class="fa-solid fa-chalkboard-user"></i> Nota para el docente</div><p>Usá el “¿Qué imprime?” como ticket de salida: que lo respondan individualmente en 3 minutos. Si más de un tercio falla la pregunta 2, retomá in-place y <code>None</code> al inicio de la próxima clase.</p></aside></div></div>
+</section>
+<footer class="pie"><span><i class="fa-solid fa-graduation-cap"></i> Programación en Python · Clase 5: Listas</span><span class="firma">Lic. Santiago Mendoza, MSc.</span></footer>
+</main>
+</div>
+<script type="text/python">
+from browser import window
+import sys
+
+class _Salida:
+    def __init__(self):
+        self.partes = []
+    def write(self, s):
+        self.partes.append(str(s))
+    def flush(self):
+        pass
+
+def _ejecutar(codigo):
+    out = _Salida()
+    viejo_out, viejo_err = sys.stdout, sys.stderr
+    sys.stdout = out
+    sys.stderr = out
+    error = ""
+    linea = 0
+    try:
+        exec(codigo, {"__name__": "__main__"})
+    except BaseException as e:
+        error = type(e).__name__ + ": " + str(e)
+        try:
+            if isinstance(e, SyntaxError) and e.lineno:
+                linea = e.lineno
+            else:
+                tb = e.__traceback__
+                while tb is not None:
+                    if tb.tb_frame.f_code.co_filename in ("<string>", "exec"):
+                        linea = tb.tb_lineno
+                    tb = tb.tb_next
+        except Exception:
+            linea = 0
+    finally:
+        sys.stdout, sys.stderr = viejo_out, viejo_err
+    return [''.join(out.partes), error, linea]
+
+window.pyRun = _ejecutar
+</script>
+<script>
+(function(){
+const KW=/\b(def|return|if|elif|else|for|while|in|not|and|or|is|import|from|as|with|break|continue|pass|None|True|False|del|try|except|lambda|global)\b/;
+const BI=/\b(print|len|range|list|sorted|sum|max|min|type|id|enumerate|str|int|float|input|open|round|set|copy)\b/;
+const RE=/(#[^\n]*)|(f?"(?:[^"\\\n]|\\.)*"|f?'(?:[^'\\\n]|\\.)*')|(^[ \t]*[A-Za-z_]\w*(?=[ \t]*(?:[+\-*\/]?=)(?!=)))|(\.[A-Za-z_]\w*(?=\())|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b/gm;
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function hl(src){
+  let out="",last=0,m;RE.lastIndex=0;
+  while((m=RE.exec(src))){
+    out+=esc(src.slice(last,m.index));last=RE.lastIndex;
+    if(m[1])out+=`<span class="tok-c">${esc(m[1])}</span>`;
+    else if(m[2])out+=`<span class="tok-s">${esc(m[2])}</span>`;
+    else if(m[3]){const ws=m[3].match(/^[ \t]*/)[0];const id=m[3].slice(ws.length);
+      out+=ws+(KW.test(id)?`<span class="tok-k">${id}</span>`:`<span class="tok-v">${id}</span>`);}
+    else if(m[4])out+=`.<span class="tok-m">${esc(m[4].slice(1))}</span>`;
+    else if(m[5])out+=`<span class="tok-n">${m[5]}</span>`;
+    else if(m[6]){const w=m[6];out+=KW.test(w)&&w.match(KW)[0]===w?`<span class="tok-k">${w}</span>`:(BI.test(w)&&w.match(BI)[0]===w?`<span class="tok-b">${w}</span>`:w);}
+    if(m[0].length===0)RE.lastIndex++;
+  }
+  return out+esc(src.slice(last));
+}
+
+/* ---- Python runtime (Brython) ---- */
+let pyListo=false;const espera=[];
+function marcarListo(){pyListo=true;const e=document.getElementById("py-estado");if(e){e.classList.add("listo");e.querySelector("span:last-child").textContent="Python listo para ejecutar";}
+  document.querySelectorAll("[data-espera]").forEach(b=>{b.disabled=false;b.removeAttribute("data-espera");});espera.splice(0).forEach(f=>f());}
+window.__pyListo=marcarListo;
+function correr(src,cb){if(pyListo&&window.pyRun){cb(window.pyRun(src));}else{espera.push(()=>cb(window.pyRun(src)));}}
+
+const AYUDAS=[
+ [/pop from empty list|pop index out of range/i,"Hiciste pop() sobre una lista vacía. Protegelo con un guardián: if lista: ..."],
+ [/index out of range/i,"Accediste a una posición que no existe. El último índice válido es len(lista) - 1 (o -1). Revisá también si la lista puede estar vacía."],
+ [/NoneType/i,"Una variable vale None. Casi siempre es por reasignar un método in-place: t = t.append(x) o t = t.sort(). Esos métodos devuelven None."],
+ [/can only concatenate list/i,"Con + solo podés unir lista + lista. Envolvé el valor entre corchetes: t + [x]."],
+ [/not in list/i,"remove() o index() no encontraron ese valor. Verificá antes con: if x in lista:"],
+ [/not supported between instances/i,"Estás comparando u ordenando tipos mezclados (por ejemplo str con int). Ordená listas de un solo tipo."],
+ [/does not support item assignment/i,"Ese tipo es inmutable (str o tuple): no se puede cambiar un elemento por índice. Las listas sí lo permiten."],
+ [/ZeroDivisionError|division by zero/i,"Dividiste por cero: seguramente len() de una lista vacía. Agregá un guardián antes de dividir."],
+ [/NameError/i,"Usaste un nombre que no existe todavía: revisá cómo lo escribiste y que esté definido antes de usarlo."],
+ [/IndentationError|SyntaxError/i,"Error de sintaxis: revisá los dos puntos (:) al final de if/for/def, los paréntesis y la sangría."]
+];
+function pintarSalida(pre,res){
+  pre.hidden=false;pre.innerHTML="";
+  let [out,err,linea]=res&&res.length?[res[0],res[1],res[2]]:["","",0];
+  if(out)pre.append(document.createTextNode(out));
+  if(err){const s=document.createElement("span");s.className="err";s.textContent=(linea?`Línea ${linea} → `:"")+err;pre.append(s);
+    const a=AYUDAS.find(([r])=>r.test(err));if(a){const h=document.createElement("span");h.className="ayuda";h.textContent="💡 "+a[1];pre.append(h);}}
+  if(!out&&!err){const s=document.createElement("span");s.className="meta";s.textContent="(el programa no imprimió nada)";pre.append(s);}
+}
+
+/* ---- code windows ---- */
+document.querySelectorAll("pre.py").forEach(pre=>{
+  const src=pre.textContent;pre.innerHTML=hl(src);
+  if(pre.dataset.bare)return;
+  const win=pre.parentElement,bar=document.createElement("div");bar.className="win-bar";
+  bar.innerHTML=`<span class="d"></span><span class="d"></span><span class="d"></span><span class="titulo"></span>`;
+  bar.querySelector(".titulo").textContent=pre.dataset.title||"python";
+  const copiar=document.createElement("button");copiar.textContent="Copiar";copiar.type="button";
+  copiar.onclick=()=>{const t=win.querySelector("textarea");const txt=t?t.value:src;
+    (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>{copiar.textContent="Copiado";setTimeout(()=>copiar.textContent="Copiar",1200)}).catch(()=>{copiar.textContent="No se pudo copiar"});};
+  bar.append(copiar);
+  if(pre.dataset.run==="1"){
+    const ed=document.createElement("button");ed.textContent="Editar";ed.type="button";
+    const run=document.createElement("button");run.className="run";run.type="button";run.innerHTML='<i class="fa-solid fa-play"></i> Ejecutar';
+    const salida=document.createElement("pre");salida.className="consola";salida.hidden=true;
+    ed.onclick=()=>{let t=win.querySelector("textarea");
+      if(t){pre.innerHTML=hl(t.value);t.replaceWith(pre);ed.textContent="Editar";}
+      else{t=document.createElement("textarea");t.spellcheck=false;t.value=pre.dataset.cur||src;t.rows=Math.min(24,src.split("\n").length+1);t.setAttribute("aria-label","Editor de código");pre.replaceWith(t);t.focus();ed.textContent="Ver resaltado";
+        t.addEventListener("input",()=>pre.dataset.cur=t.value);t.addEventListener("keydown",tabular);}
+    };
+    run.onclick=()=>{const t=win.querySelector("textarea");const code=t?t.value:(pre.dataset.cur||src);
+      run.disabled=true;run.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Ejecutando';
+      setTimeout(()=>correr(code,r=>{pintarSalida(salida,r);run.disabled=false;run.innerHTML='<i class="fa-solid fa-play"></i> Ejecutar';}),30);};
+    bar.append(ed,run);win.append(salida);
+  }
+  win.prepend(bar);
+});
+function tabular(e){if(e.key==="Tab"&&!e.shiftKey){e.preventDefault();const t=e.target,s=t.selectionStart;t.setRangeText("    ",s,t.selectionEnd,"end");}}
+
+/* ---- exercise editors ---- */
+document.querySelectorAll(".practica").forEach(p=>{
+  const ta=p.querySelector("textarea"),out=p.querySelector(".consola"),key="ej:"+p.closest(".ej").id;
+  try{const g=localStorage.getItem(key);if(g)ta.value=g;}catch(e){}
+  ta.addEventListener("keydown",tabular);
+  ta.addEventListener("input",()=>{try{localStorage.setItem(key,ta.value)}catch(e){}});
+  p.querySelector(".js-reset").onclick=()=>{ta.value=ta.dataset.start;try{localStorage.removeItem(key)}catch(e){};out.hidden=true;};
+  const run=p.querySelector(".js-run-ej");
+  run.onclick=()=>{run.disabled=true;setTimeout(()=>correr(ta.value,r=>{pintarSalida(out,r);run.disabled=false;}),30);};
+});
+
+/* ---- alias simulator ---- */
+const al=document.getElementById("alias");
+if(al){let modo="alias",a=[1,2,3],b=a,ult=null;const mem=al.querySelector(".alias-mem"),msg=al.querySelector(".alias-msg");
+  const caja=(arr,etqs,id)=>`<div class="obj"><div class="etqs">${etqs.map(e=>`<span class="etq">${e}</span>`).join("")}</div><div class="caja">${arr.map((v,i)=>`<span class="${v===99&&i===arr.length-1&&ult?"nuevo":""}">${v}</span>`).join("")}</div><small>id: ${id}</small></div>`;
+  function render(){
+    if(a===b)mem.innerHTML=caja(a,["a","b"],"140321");
+    else mem.innerHTML=caja(a,["a"],"140321")+caja(b,["b"],"140877");
+    if(!ult)msg.innerHTML=modo==="alias"?"<b>b = a</b>: hay <b>un solo objeto</b> con dos etiquetas. <code>a is b</code> → True.":"<b>b = a.copy()</b>: hay <b>dos objetos</b> distintos con el mismo contenido. <code>a is b</code> → False.";
+    else msg.innerHTML=modo==="alias"?`Después de <code>b.append(99)</code>: <code>print(a)</code> → <b>[${a.join(", ")}]</b>. ¡Cambió a, aunque nunca la tocamos!`:`Después de <code>b.append(99)</code>: <code>print(a)</code> → <b>[${a.join(", ")}]</b>. a quedó intacta.`;
+  }
+  function reset(){a=[1,2,3];b=modo==="alias"?a:a.slice();ult=null;render();}
+  al.querySelectorAll("[data-modo]").forEach(btn=>btn.onclick=()=>{modo=btn.dataset.modo;al.querySelectorAll("[data-modo]").forEach(x=>x.classList.toggle("on",x===btn));reset();});
+  al.querySelector('[data-acc="append"]').onclick=()=>{b.push(99);ult=true;render();};
+  al.querySelector('[data-acc="reset"]').onclick=reset;reset();}
+
+/* ---- slicer ---- */
+const sl=document.getElementById("slicer");
+if(sl){const L=[10,20,30,40,50,60],n=L.length;const ini=sl.querySelector("#s-ini"),fin=sl.querySelector("#s-fin"),paso=sl.querySelector("#s-paso");
+  const cel=sl.querySelector(".slicer-celdas"),res=sl.querySelector(".slicer-res");
+  const num=v=>{v=v.trim();if(v==="")return null;if(!/^-?\d+$/.test(v))return NaN;return parseInt(v,10);};
+  function idx(st,sp,sv){ // CPython slice.indices
+    const step=sv===null?1:sv;const lo=step>0?0:-1,hi=step>0?n:n-1;
+    const fix=(v,d)=>{if(v===null)return d;if(v<0){v+=n;if(v<lo)v=lo;}else if(v>hi)v=hi;return v;};
+    const s=fix(st,step>0?lo:hi),e=fix(sp,step>0?hi:lo);const out=[];
+    if(step>0)for(let i=s;i<e;i+=step)out.push(i);else for(let i=s;i>e;i+=step)out.push(i);return out;}
+  function render(){const s=num(ini.value),e=num(fin.value),p=num(paso.value);
+    let elegidos=[],error="";
+    if([s,e,p].some(Number.isNaN))error="Solo números enteros (o vacío).";else if(p===0)error="ValueError: slice step cannot be zero";else elegidos=idx(s,e,p);
+    cel.innerHTML=L.map((v,i)=>{const o=elegidos.indexOf(i);return `<div class="celda ${o>=0?"sel":""}">${o>=0?`<span class="ord">${o+1}</span>`:""}<b>${v}</b><small>${i}</small><small style="color:var(--red)">${i-n}</small></div>`}).join("");
+    const expr=`numeros[${ini.value.trim()}:${fin.value.trim()}${paso.value.trim()!==""?":"+paso.value.trim():""}]`;
+    res.innerHTML=error?`<span class="err">${error}</span>`:`${expr} → [${elegidos.map(i=>L[i]).join(", ")}]`;}
+  [ini,fin,paso].forEach(x=>x.addEventListener("input",render));
+  sl.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{const [x,y,z]=b.dataset.p.split(",");ini.value=x;fin.value=y;paso.value=z;render();});
+  ini.value="1";fin.value="4";render();}
+
+/* ---- quiz ---- */
+let resp=0;const total=document.querySelectorAll(".q").length;
+document.querySelectorAll(".q").forEach(q=>{const fb=q.querySelector(".q-fb");
+  q.querySelectorAll(".q-op").forEach(b=>b.onclick=()=>{if(q.dataset.done)return;q.dataset.done=1;resp++;
+    const ok=b.dataset.ok==="1";b.classList.add(ok?"ok":"no");q.querySelector('[data-ok="1"]').classList.add("ok");
+    fb.textContent=(ok?"✔ Correcto. ":"✘ No. ")+q.dataset.exp;q.dataset.bien=ok?1:0;
+    const bien=document.querySelectorAll('.q[data-bien="1"]').length;
+    document.getElementById("q-score").textContent=`Respondidas: ${resp} de ${total} | Correctas: ${bien}`;});});
+
+/* ---- teacher mode ---- */
+const sw=document.getElementById("modo-docente");
+function aplicarModo(on){document.body.classList.toggle("alumno",!on);sw.checked=on;document.getElementById("modo-lbl").textContent=on?"Vista docente":"Vista alumno";}
+let docente=true;try{const g=localStorage.getItem("modo-docente");if(g!==null)docente=g==="1";}catch(e){}
+aplicarModo(docente);sw.onchange=()=>{aplicarModo(sw.checked);try{localStorage.setItem("modo-docente",sw.checked?"1":"0")}catch(e){}};
+
+/* ---- class timer ---- */
+const AG=[["apertura","Apertura",5],["m1","Módulo 1",25],["m2","Módulo 2",30],["pausa","Pausa",10],["m3","Módulo 3",15],["m4","Módulo 4",30],["cierre","Cierre",5]];
+const ul=document.getElementById("agenda");let acc=0;
+ul.innerHTML=AG.map(([id,t,m])=>{const d=acc;acc+=m;const f=x=>`${Math.floor(x/60)}:${String(x%60).padStart(2,"0")}`;return `<li><a href="#${id}" data-ini="${d}" data-fin="${acc}"><span>${t}</span><span>${f(d)}–${f(acc)}</span></a></li>`}).join("");
+let seg=0,tick=null;const reloj=document.getElementById("reloj"),barra=document.getElementById("barra"),bt=document.getElementById("t-play");
+function pintar(){const m=Math.floor(seg/60),s=seg%60;reloj.innerHTML=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")} <small>/ 120:00</small>`;
+  barra.style.width=Math.min(100,seg/72)+"%";const min=seg/60;
+  ul.querySelectorAll("a").forEach(a=>{const i=+a.dataset.ini,f=+a.dataset.fin;a.classList.toggle("activo",seg>0&&min>=i&&min<f);a.classList.toggle("hecho",min>=f);});}
+bt.onclick=()=>{if(tick){clearInterval(tick);tick=null;bt.innerHTML='<i class="fa-solid fa-play"></i> Seguir';}else{tick=setInterval(()=>{seg++;pintar();},1000);bt.innerHTML='<i class="fa-solid fa-pause"></i> Pausar';}};
+document.getElementById("t-reset").onclick=()=>{clearInterval(tick);tick=null;seg=0;bt.innerHTML='<i class="fa-solid fa-play"></i> Iniciar';pintar();};
+pintar();
+
+window.addEventListener("load",()=>{setTimeout(()=>{if(!window.pyRun&&window.brython){try{brython({debug:0})}catch(e){}}
+  const chk=setInterval(()=>{if(window.pyRun){clearInterval(chk);marcarListo();}},150);},50);});
+})();
+</script>
+</body>
+</html>
